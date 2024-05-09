@@ -32,6 +32,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.challange.R
+import br.com.fiap.challange.ui.theme.Gray
+import br.com.fiap.challange.ui.theme.MainBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,9 +83,9 @@ fun Input(
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = Color.Black,
                         cursorColor = Color.Black,
-                        focusedIndicatorColor = Color(0xFF0E52C7),
+                        focusedIndicatorColor = MainBlue,
                         containerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color(0xff808080)
+                        unfocusedIndicatorColor = Gray
                     ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     leadingIcon = {
@@ -138,9 +140,9 @@ fun Input(
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = Color.Black,
                         cursorColor = Color.Black,
-                        focusedIndicatorColor = Color(0xFF0E52C7),
+                        focusedIndicatorColor = MainBlue,
                         containerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color(0xff808080)
+                        unfocusedIndicatorColor = Gray
                     )
                 )
             }

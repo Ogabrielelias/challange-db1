@@ -33,7 +33,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import br.com.fiap.challange.ui.theme.Blue70
 import br.com.fiap.challange.ui.theme.Gray50
-import br.com.fiap.challange.ui.theme.Red40
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
