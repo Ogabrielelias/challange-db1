@@ -72,8 +72,16 @@ fun LoginScreen (navController: NavController) {
         }
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(R.drawable.educologo),
+                contentDescription = null,
+                Modifier
+                    .size(240.dp)
+            )
+
                 FormLogin(onSend = { status ->
                     var message = "Login efetuado!"
                     if(!status){
@@ -120,10 +128,11 @@ fun FormLogin(onSend: (status:Boolean) -> Unit){
     }
 
     Column (
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+        modifier = Modifier.padding(all = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Input(
                 label = "Email",
