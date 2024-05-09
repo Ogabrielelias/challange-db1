@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.navigation.NavController
+import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.R
 import br.com.fiap.challange.database.repository.UserRepository
 import br.com.fiap.challange.model.User
@@ -68,147 +69,7 @@ fun RegisterScreen (navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
 
-                FormRegister(onSend = { status ->
-                    var message = "Conta Registrada!"
-                    if(!status){
-                        message = "E-mail já cadastrado!"
-                    }
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                })
-        }
-    }
-}
 
-fun validateRegisterInputs (name:String, email:String, senha:String) : Boolean {
-    if(
-        name.length >= 3 &&
-        !TextUtils.isEmpty(email) &&
-        Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
-        senha.length >= 8
-    ) return true
-
-    return false
-}
-
-@Composable
-fun FormRegister(onSend: (status:Boolean) -> Unit){
-    val context = LocalContext.current
-    val userRepository = UserRepository(context)
-
-    var error = remember { mutableStateOf(false) }
-
-    val buttonDisabled = remember { mutableStateOf(true) }
-
-    var nameValue = remember {
-        mutableStateOf("")
-    }
-
-    var emailValue = remember {
-        mutableStateOf("")
-    }
-
-    var senhaValue = remember {
-        mutableStateOf("")
-    }
-
-    Column (
-        verticalArrangement = Arrangement.spacedBy(32.dp)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Input(
-                label = "Nome",
-                value = nameValue.value,
-                onChange = { value ->
-                    nameValue.value = value
-                    error.value = false
-                    buttonDisabled.value = !validateRegisterInputs(
-                        value,
-                        emailValue.value,
-                        senhaValue.value
-                    )
-                },
-                frontImage = R.drawable.user,
-                isError = error.value
-            )
-
-            Input(
-                label = "Email",
-                value = emailValue.value,
-                onChange = { value ->
-                    emailValue.value = value
-                    error.value = false
-                    buttonDisabled.value = !validateRegisterInputs(
-                        nameValue.value,
-                        value,
-                        senhaValue.value
-                    )
-                },
-                frontImage = R.drawable.mail,
-                isError = error.value
-            )
-
-            Input(
-                label = "Senha",
-                value = senhaValue.value,
-                onChange = { value ->
-                    senhaValue.value = value
-                    error.value = false
-                    buttonDisabled.value = !validateRegisterInputs(
-                        nameValue.value,
-                        emailValue.value,
-                        value
-                    )
-                },
-                type = "password",
-                frontImage = R.drawable.lock,
-                isError = error.value
-            )
-        }
-
-        Button(
-            enabled = !buttonDisabled.value,
-            onClick = {
-                try{
-                    val usuario = User(
-                        name = nameValue.value,
-                        email = emailValue.value,
-                        password = senhaValue.value
-                    )
-
-                    userRepository.save(usuario)
-
-                    onSend(true)
-
-                    nameValue.value = ""
-                    emailValue.value = ""
-                    senhaValue.value = ""
-
-                }catch (err:Throwable) {
-                    error.value = true
-                    onSend(false)
-                }
-                      },
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0XFF0D65FB),
-                disabledContainerColor = Color(0XFF162A4D),
-                disabledContentColor = Color.Gray
-            )
-        ) {
-            Text(
-                "Registrar  ➔",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
         }
     }
 }

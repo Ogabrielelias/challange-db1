@@ -46,7 +46,8 @@ fun TabNavigationScreen(navController: NavHostController) {
         containerColor = Color.Transparent,
         bottomBar = {
             println(navController.currentDestination?.route)
-            if (currentRoute !in listOf("login", "register")) {
+            // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
+            if (currentRoute in listOf("")) {
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = Gray50,
@@ -57,8 +58,8 @@ fun TabNavigationScreen(navController: NavHostController) {
                         .padding(all = 16.dp),
                 ) {
                     Tab(
-                        selected = currentRoute == "activity",
-                        onClick = { navController.navigate("activity"); currentTab = 0 },
+                        selected = currentRoute == "",
+                        onClick = { navController.navigate(""); currentTab = 0 },
                         text = {
                             Icon(
                                 imageVector = Icons.Default.Star,
@@ -69,8 +70,8 @@ fun TabNavigationScreen(navController: NavHostController) {
                         }
                     )
                     Tab(
-                        selected = currentRoute == "heartbeat",
-                        onClick = { navController.navigate("heartbeat"); currentTab = 1 },
+                        selected = currentRoute == "",
+                        onClick = { navController.navigate(""); currentTab = 1 },
                         text = {
                             Icon(
                                 imageVector = Icons.Default.Favorite,

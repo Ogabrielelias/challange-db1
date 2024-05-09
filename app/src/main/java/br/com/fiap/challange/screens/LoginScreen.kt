@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -57,6 +53,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.navigation.NavController
+import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.R
 import br.com.fiap.challange.database.repository.UserRepository
 import kotlinx.coroutines.launch
@@ -161,7 +158,6 @@ fun FormLogin(onSend: (status:Boolean) -> Unit){
         }
 
         Button(
-            enabled = !buttonDisabled.value,
             onClick = { ->
                 try{
                     val user = userRepository.getUserByLogin(
@@ -185,167 +181,16 @@ fun FormLogin(onSend: (status:Boolean) -> Unit){
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0XFF0D65FB),
-                disabledContainerColor = Color(0XFF162A4D),
-                disabledContentColor = Color.Gray
+                containerColor = Color(0XFF001CB0),
+                disabledContainerColor = Color(0xFF1F2E7E),
+                disabledContentColor = Color(0xFFC9C9C9)
             )
         ) {
             Text(
-                "Continuar  ➔",
+                "Entrar",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Input(
-    label:String,
-    value:String,
-    onChange:(value:String) -> Unit,
-    type: String = "",
-    frontImage:Int,
-    isError: Boolean = false
-){
-
-    var inputIsFocused = remember {
-        mutableStateOf("")
-    }
-
-    var password = remember {
-        mutableStateOf("")
-    }
-    var passwordVisible : Boolean by remember{
-        mutableStateOf(false)
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ){
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFFFFFFF)
-        )
-        OutlinedTextFieldBackground(
-            Color(0xFF131A30),
-            isFocused = inputIsFocused.value == "Active"
-        ) {
-            if(type === "password"){
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = { value ->
-                        onChange(value)
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    isError=isError,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { state ->
-                            inputIsFocused.value = state.toString()
-                        },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.White,
-                        cursorColor = Color.White,
-                        focusedIndicatorColor = Color(0xFF0E52C7),
-                        containerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    leadingIcon = {
-                        Image(
-                        painter = painterResource(frontImage),
-                        contentDescription = null,
-                        Modifier
-                            .size(24.dp)
-                        )
-                                  },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                            passwordVisible = !passwordVisible
-                            }
-                        ) {
-                            var image = R.drawable.eye
-                            if(passwordVisible) image = R.drawable.eyeoff
-                            Image(
-                                painter = painterResource(image),
-                                contentDescription = null,
-                                Modifier
-                                    .size(32.dp)
-                            )
-                        }
-                    }
-                )
-            }else {
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = { value ->
-                        onChange(value)
-                    },
-                    isError = isError,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { state ->
-                            inputIsFocused.value = state.toString()
-                        },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    leadingIcon = {
-                        Image(
-                            painter = painterResource(frontImage),
-                            contentDescription = null,
-                            Modifier
-                                .size(24.dp)
-                        )
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.White,
-                        cursorColor = Color.White,
-                        focusedIndicatorColor = Color(0xFF0E52C7),
-                        containerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    )
-                )
-            }
-        }
-    }
-}
-@Composable
-fun OutlinedTextFieldBackground(
-    color: Color,
-    isFocused: Boolean,
-    content: @Composable () -> Unit
-) {
-
-    var boxModifier = Modifier
-        .background(
-            color,
-            shape = RoundedCornerShape(5.dp)
-        )
-
-    if (isFocused){
-        boxModifier = Modifier
-            .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(8.dp),
-                ambientColor = Color(0xFF0E52C7),
-                spotColor = Color(0xFF0E52C7),
-            )
-            .background(
-                color,
-                shape = RoundedCornerShape(5.dp)
-            )
-    }
-
-    Box {
-        Box(
-            modifier = boxModifier.matchParentSize()
-        )
-        content()
     }
 }
