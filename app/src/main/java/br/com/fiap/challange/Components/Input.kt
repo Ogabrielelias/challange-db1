@@ -39,14 +39,14 @@ import br.com.fiap.challange.ui.theme.MainBlue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Input(
-    label:String? = null,
+    label: String? = null,
     placeholder: String = "",
-    value:String,
-    onChange:(value:String) -> Unit,
-    type: String = "",
+    value: String,
+    onChange: (value: String) -> Unit,
+    type: String? = "",
     frontImage: Int? = null,
     isError: Boolean = false
-){
+) {
 
     var inputIsFocused = remember {
         mutableStateOf("")
@@ -55,26 +55,26 @@ fun Input(
     var password = remember {
         mutableStateOf("")
     }
-    var passwordVisible : Boolean by remember{
+    var passwordVisible: Boolean by remember {
         mutableStateOf(false)
     }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-    ){
+    ) {
         OutlinedTextFieldBackground(
             Color.White,
         ) {
-            if(type === "password"){
+            if (type === "password") {
                 OutlinedTextField(
-                    label= { if (label!=null) Text(label) },
-                    placeholder={ Text(placeholder) },
+                    label = { if (label != null) Text(label) },
+                    placeholder = { Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
                         onChange(value)
                     },
                     shape = RoundedCornerShape(10.dp),
-                    isError=isError,
+                    isError = isError,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { state ->
@@ -89,13 +89,14 @@ fun Input(
                     ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     leadingIcon = {
-                        if (frontImage != null){
+                        if (frontImage != null) {
                             Image(
                                 painter = painterResource(frontImage),
                                 contentDescription = null,
                                 Modifier
                                     .size(24.dp)
-                            )}
+                            )
+                        }
                     },
                     trailingIcon = {
                         IconButton(
@@ -104,7 +105,7 @@ fun Input(
                             }
                         ) {
                             var image = R.drawable.eye
-                            if(passwordVisible) image = R.drawable.eyeoff
+                            if (passwordVisible) image = R.drawable.eyeoff
                             Image(
                                 painter = painterResource(image),
                                 contentDescription = null,
@@ -114,10 +115,10 @@ fun Input(
                         }
                     }
                 )
-            }else {
+            } else {
                 OutlinedTextField(
-                    label= { if (label!=null) Text(label) },
-                    placeholder={ Text(placeholder) },
+                    label = { if (label != null) Text(label) },
+                    placeholder = { Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
                         onChange(value)
@@ -153,6 +154,7 @@ fun Input(
         }
     }
 }
+
 @Composable
 fun OutlinedTextFieldBackground(
     color: Color,
