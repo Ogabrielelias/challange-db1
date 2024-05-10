@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.challange.R
@@ -38,12 +39,12 @@ import br.com.fiap.challange.ui.theme.MainBlue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Input(
-    label:String = "",
+    label:String? = null,
     placeholder: String = "",
     value:String,
     onChange:(value:String) -> Unit,
     type: String = "",
-    frontImage:Int,
+    frontImage: Int? = null,
     isError: Boolean = false
 ){
 
@@ -66,7 +67,7 @@ fun Input(
         ) {
             if(type === "password"){
                 OutlinedTextField(
-                    label= { Text(label) },
+                    label= { if (label!=null) Text(label) },
                     placeholder={ Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
@@ -81,7 +82,6 @@ fun Input(
                         },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
                         containerColor = Color.Transparent,
@@ -89,12 +89,13 @@ fun Input(
                     ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     leadingIcon = {
-                        Image(
-                            painter = painterResource(frontImage),
-                            contentDescription = null,
-                            Modifier
-                                .size(24.dp)
-                        )
+                        if (frontImage != null){
+                            Image(
+                                painter = painterResource(frontImage),
+                                contentDescription = null,
+                                Modifier
+                                    .size(24.dp)
+                            )}
                     },
                     trailingIcon = {
                         IconButton(
@@ -115,7 +116,7 @@ fun Input(
                 )
             }else {
                 OutlinedTextField(
-                    label= { Text(label) },
+                    label= { if (label!=null) Text(label) },
                     placeholder={ Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
@@ -130,15 +131,18 @@ fun Input(
                         },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     leadingIcon = {
-                        Image(
-                            painter = painterResource(frontImage),
-                            contentDescription = null,
-                            Modifier
-                                .size(24.dp)
-                        )
+                        if (frontImage != null) {
+                            Image(
+                                painter = painterResource(frontImage),
+                                contentDescription = null,
+                                Modifier
+                                    .size(24.dp)
+                            )
+                        } else {
+                            null
+                        }
                     },
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
                         containerColor = Color.Transparent,
