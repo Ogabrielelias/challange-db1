@@ -271,6 +271,14 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                                 )
                             )
                             message = "Conta registrada!"
+
+                            emailValue.value = ""
+                            senhaValue.value = ""
+                            confirmarSenhaValue.value = ""
+                            nomeValue.value = ""
+                            idadeValue.value = ""
+                            generoValue.value = ""
+                            tipoValue.value = ""
                         } else {
                             error.value = true
                             message = "E-mail já cadastrado!"
