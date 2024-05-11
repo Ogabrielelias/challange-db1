@@ -25,6 +25,9 @@ interface UserDAO {
     @Query("SELECT * FROM tb_user WHERE email = :email and password = :senha")
     fun getUserByLogin(email:String, senha:String): User
 
+    @Query("SELECT * FROM tb_user WHERE email = :email ")
+    fun getUserByEmail(email:String): User
+
     @Query("SELECT * FROM tb_user ORDER BY name ASC")
     fun listUser(): List<User>
 }

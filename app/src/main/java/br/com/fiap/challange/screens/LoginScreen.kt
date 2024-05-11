@@ -104,7 +104,7 @@ fun LoginScreen(navController: NavController) {
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
-                        navController.navigate("activity")
+                        navController.navigate("register")
                     }
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -139,7 +139,7 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
     if (
         !TextUtils.isEmpty(email) &&
         Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
-        senha.length >= 8
+        senha.length > 0
     ) return true
 
     return false

@@ -1,17 +1,10 @@
 package br.com.fiap.challange.screens
 
 import android.annotation.SuppressLint
-import android.text.TextUtils
-import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,7 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -98,13 +90,7 @@ fun RegisterScreen(navController: NavController) {
                     fontWeight = FontWeight.Bold,
                 )
 
-                FormRegister(onSend = { status ->
-                    var message = "Login efetuado!"
-                    if (!status) {
-                        message = "E-mail e/ou Senha Inválido!"
-                    } else {
-                        navController.navigate("activity")
-                    }
+                FormRegister(onSend = { message ->
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message,
@@ -118,7 +104,7 @@ fun RegisterScreen(navController: NavController) {
                         textAlign = TextAlign.Center
                     )
                     ClickableText(
-                        text = AnnotatedString("Entrar-se"),
+                        text = AnnotatedString("Entrar"),
                         onClick = { navController.navigate("login") },
                         style = TextStyle(
                             color = MainBlue,
@@ -134,19 +120,37 @@ fun RegisterScreen(navController: NavController) {
 }
 
 @Composable
-fun FormRegister(onSend: (status: Boolean) -> Unit) {
+fun FormRegister(onSend: (message: String) -> Unit) {
     val context = LocalContext.current
     val userRepository = UserRepository(context)
 
     var error = remember { mutableStateOf(false) }
 
-    val buttonDisabled = remember { mutableStateOf(true) }
+    var nomeValue = remember {
+        mutableStateOf("")
+    }
+
+    var idadeValue = remember {
+        mutableStateOf("")
+    }
+
+    var generoValue = remember {
+        mutableStateOf("")
+    }
 
     var emailValue = remember {
         mutableStateOf("")
     }
 
     var senhaValue = remember {
+        mutableStateOf("")
+    }
+
+    var confirmarSenhaValue = remember {
+        mutableStateOf("")
+    }
+
+    var tipoValue = remember {
         mutableStateOf("")
     }
 
@@ -158,13 +162,9 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
         ) {
             Input(
                 label = "Nome",
-                value = senhaValue.value,
+                value = nomeValue.value,
                 onChange = { value ->
-                    senhaValue.value = value
-                    buttonDisabled.value = !validateLoginInputs(
-                        emailValue.value,
-                        value
-                    )
+                    nomeValue.value = value
                     error.value = false
                 },
                 isError = error.value
@@ -172,13 +172,9 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
 
             Input(
                 label = "Idade",
-                value = senhaValue.value,
+                value = idadeValue.value,
                 onChange = { value ->
-                    senhaValue.value = value
-                    buttonDisabled.value = !validateLoginInputs(
-                        emailValue.value,
-                        value
-                    )
+                    idadeValue.value = value
                     error.value = false
                 },
                 isError = error.value,
@@ -186,9 +182,12 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
             )
 
             Select(
-                label = "Sexo",
-                items = listOf("Masculino", "Feminino", "Outros"),
-                onSelect = {value -> println(value)}
+                label = "Gênero",
+                items = listOf("Masculino", "Feminino", "Outro"),
+                onSelect = { value ->
+                    generoValue.value = value
+                    error.value = false
+                }
             )
 
             Input(
@@ -196,10 +195,6 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
                 value = emailValue.value,
                 onChange = { value ->
                     emailValue.value = value
-                    buttonDisabled.value = !validateLoginInputs(
-                        value,
-                        senhaValue.value
-                    )
                     error.value = false
                 },
                 isError = error.value
@@ -210,10 +205,6 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
                 value = senhaValue.value,
                 onChange = { value ->
                     senhaValue.value = value
-                    buttonDisabled.value = !validateLoginInputs(
-                        emailValue.value,
-                        value
-                    )
                     error.value = false
                 },
                 type = "password",
@@ -222,13 +213,9 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
 
             Input(
                 label = "Confirmar Senha",
-                value = senhaValue.value,
+                value = confirmarSenhaValue.value,
                 onChange = { value ->
-                    senhaValue.value = value
-                    buttonDisabled.value = !validateLoginInputs(
-                        emailValue.value,
-                        value
-                    )
+                    confirmarSenhaValue.value = value
                     error.value = false
                 },
                 type = "password",
@@ -238,27 +225,59 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
             Select(
                 label = "Deseja ser mentor e/ou aluno?",
                 items = listOf("Mentor", "Aluno", "Ambos"),
-                onSelect = {value -> println(value)}
+                onSelect = { value ->
+                    tipoValue.value = value
+                    error.value = false
+                }
             )
         }
 
         Button(
-            enabled = !buttonDisabled.value,
             onClick = { ->
                 try {
-                    val user = userRepository.getUserByLogin(
-                        email = emailValue.value,
-                        senha = senhaValue.value
-                    )
+                    var message = ""
 
-                    if (user == null) {
-                        error.value = true
-                    } else {
-                        emailValue.value = ""
-                        senhaValue.value = ""
+                    if (senhaValue.value != confirmarSenhaValue.value) {
+                        message = "Confirmação de senha inválida!"
+                    } else if(
+                        senhaValue.value.length < 3 ||
+                        confirmarSenhaValue.value.length < 3 ||
+                        nomeValue.value.length < 3 ||
+                        idadeValue.value.toInt() < 14 ||
+                        generoValue.value == "" ||
+                        tipoValue.value == ""
+                    ){
+                        message = "Preencha todos os campos corretamente!"
+                    }else {
+                        val user = userRepository.getUserByEmail(
+                            email = emailValue.value
+                        )
+
+                        if (user == null) {
+                            val isStudent =
+                                generoValue.value == "Aluno" || generoValue.value == "Ambos"
+                            val isMentor =
+                                generoValue.value == "Mentor" || generoValue.value == "Ambos"
+
+                            userRepository.save(
+                                User(
+                                    name = nomeValue.value,
+                                    email = emailValue.value,
+                                    password = senhaValue.value,
+                                    age = idadeValue.value,
+                                    genre = generoValue.value,
+                                    isStudent = isStudent,
+                                    isMentor = isMentor
+                                )
+                            )
+                            message = "Conta registrada!"
+                        } else {
+                            error.value = true
+                            message = "E-mail já cadastrado!"
+                        }
                     }
 
-                    onSend(user != null)
+                    onSend(message)
                 } catch (err: Throwable) {
                     println(err)
                 }

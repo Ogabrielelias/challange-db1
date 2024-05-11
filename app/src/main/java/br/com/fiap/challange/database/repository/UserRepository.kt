@@ -8,16 +8,16 @@ class UserRepository(context: Context) {
 
     private val db = UserDB.getDatabase(context).userDao()
 
-    fun save(contato: User): Long {
-        return db.save(contato)
+    fun save(user: User): Long {
+        return db.save(user)
     }
 
-    fun update(contato: User): Int {
-        return db.update(contato)
+    fun update(user: User): Int {
+        return db.update(user)
     }
 
-    fun delete(contato: User): Int {
-        return db.delete(contato)
+    fun delete(user: User): Int {
+        return db.delete(user)
     }
 
     fun listUser(): List<User> {
@@ -30,6 +30,10 @@ class UserRepository(context: Context) {
 
     fun getUserByLogin(email:String, senha:String): User {
         return db.getUserByLogin(email, senha)
+    }
+
+    fun getUserByEmail(email:String): User {
+        return db.getUserByEmail(email)
     }
 
 }

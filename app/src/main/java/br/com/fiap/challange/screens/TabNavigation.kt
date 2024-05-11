@@ -44,7 +44,6 @@ fun TabNavigationScreen(navController: NavHostController) {
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
-            println(navController.currentDestination?.route)
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
             if (currentRoute in listOf("")) {
                 TabRow(
