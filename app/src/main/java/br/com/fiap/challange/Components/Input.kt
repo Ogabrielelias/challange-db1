@@ -45,7 +45,8 @@ fun Input(
     onChange: (value: String) -> Unit,
     type: String? = "",
     frontImage: Int? = null,
-    isError: Boolean = false
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
 ) {
 
     var inputIsFocused = remember {
@@ -58,6 +59,17 @@ fun Input(
     var passwordVisible: Boolean by remember {
         mutableStateOf(false)
     }
+
+    var inputFrontImg: (@Composable () -> Unit)? = if (frontImage != null) {
+        {
+            Image(
+                painter = painterResource(frontImage),
+                contentDescription = null,
+                Modifier
+                    .size(24.dp)
+            )
+        }
+    } else null
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -80,7 +92,7 @@ fun Input(
                         .onFocusChanged { state ->
                             inputIsFocused.value = state.toString()
                         },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions = keyboardOptions,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
@@ -88,16 +100,7 @@ fun Input(
                         unfocusedIndicatorColor = Gray
                     ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    leadingIcon = {
-                        if (frontImage != null) {
-                            Image(
-                                painter = painterResource(frontImage),
-                                contentDescription = null,
-                                Modifier
-                                    .size(24.dp)
-                            )
-                        }
-                    },
+                    leadingIcon = inputFrontImg,
                     trailingIcon = {
                         IconButton(
                             onClick = {
@@ -130,19 +133,8 @@ fun Input(
                         .onFocusChanged { state ->
                             inputIsFocused.value = state.toString()
                         },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    leadingIcon = {
-                        if (frontImage != null) {
-                            Image(
-                                painter = painterResource(frontImage),
-                                contentDescription = null,
-                                Modifier
-                                    .size(24.dp)
-                            )
-                        } else {
-                            null
-                        }
-                    },
+                    keyboardOptions = keyboardOptions,
+                    leadingIcon = inputFrontImg,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,

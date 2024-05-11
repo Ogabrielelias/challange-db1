@@ -71,13 +71,17 @@ fun LoginScreen(navController: NavController) {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-                Image(
-                    painter = painterResource(R.drawable.educologo),
-                    contentDescription = null,
-                    Modifier
-                        .width(240.dp)
-                        .height(40.dp)
-                )
+            Image(
+                painter = painterResource(R.drawable.educologo),
+                contentDescription = null,
+                Modifier
+                    .width(240.dp)
+                    .height(40.dp)
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -85,10 +89,9 @@ fun LoginScreen(navController: NavController) {
 
                     Text(
                         "Seja bem-vindo!",
-                        fontSize = 24.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-
-                        )
+                    )
                     Text(
                         "Faça login e comece sua jornada de aprendizado e orientação agora mesmo!",
                         fontSize = 16.sp,
@@ -96,7 +99,6 @@ fun LoginScreen(navController: NavController) {
                     )
 
                 }
-
                 FormLogin(onSend = { status ->
                     var message = "Login efetuado!"
                     if (!status) {
@@ -111,6 +113,8 @@ fun LoginScreen(navController: NavController) {
                         )
                     }
                 })
+            }
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Não possui uma conta? ",
