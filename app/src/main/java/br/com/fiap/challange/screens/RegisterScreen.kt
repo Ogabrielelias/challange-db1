@@ -239,16 +239,16 @@ fun FormRegister(onSend: (message: String) -> Unit) {
 
                     if (senhaValue.value != confirmarSenhaValue.value) {
                         message = "Confirmação de senha inválida!"
-                    } else if(
+                    } else if (
                         senhaValue.value.length < 3 ||
                         confirmarSenhaValue.value.length < 3 ||
                         nomeValue.value.length < 3 ||
                         idadeValue.value.toInt() < 14 ||
                         generoValue.value == "" ||
                         tipoValue.value == ""
-                    ){
+                    ) {
                         message = "Preencha todos os campos corretamente!"
-                    }else {
+                    } else {
                         val user = userRepository.getUserByEmail(
                             email = emailValue.value
                         )
@@ -270,6 +270,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                                     isMentor = isMentor
                                 )
                             )
+
                             message = "Conta registrada!"
 
                             emailValue.value = ""
@@ -287,7 +288,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
 
                     onSend(message)
                 } catch (err: Throwable) {
-                    println(err)
+                    onSend("Erro de conexão com o servidor!")
                 }
             },
             shape = RoundedCornerShape(10.dp),
