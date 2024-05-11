@@ -28,7 +28,11 @@ import br.com.fiap.challange.ui.theme.MainBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Select(items: List<String>, label: String? = null) {
+fun Select(
+    items: List<String>,
+    label: String? = null,
+    onSelect: ((value:String) -> Unit)
+) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(
@@ -73,6 +77,7 @@ fun Select(items: List<String>, label: String? = null) {
                     onClick = {
                         selectedText = item
                         expanded = false
+                        onSelect(item)
                     }
                 )
             }

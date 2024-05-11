@@ -187,7 +187,8 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
 
             Select(
                 label = "Sexo",
-                items = listOf("Masculino", "Feminino", "Outros")
+                items = listOf("Masculino", "Feminino", "Outros"),
+                onSelect = {value -> println(value)}
             )
 
             Input(
@@ -236,7 +237,8 @@ fun FormRegister(onSend: (status: Boolean) -> Unit) {
 
             Select(
                 label = "Deseja ser mentor e/ou aluno?",
-                items = listOf("Mentor", "Aluno", "Ambos")
+                items = listOf("Mentor", "Aluno", "Ambos"),
+                onSelect = {value -> println(value)}
             )
         }
 
