@@ -1,12 +1,12 @@
 package br.com.fiap.challange.database.repository
 
 import android.content.Context
-import br.com.fiap.challange.database.dao.UserDB
+import br.com.fiap.challange.database.dao.AppDatabase
 import br.com.fiap.challange.model.User
 
 class UserRepository(context: Context) {
 
-    private val db = UserDB.getDatabase(context).userDao()
+    private val db = AppDatabase.getDatabase(context).userDao()
 
     fun save(user: User): Long {
         return db.save(user)

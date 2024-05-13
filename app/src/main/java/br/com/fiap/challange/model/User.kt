@@ -3,6 +3,7 @@ package br.com.fiap.challange.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(tableName = "tb_user", indices = [Index(value = ["email"], unique = true)])
 data class User (

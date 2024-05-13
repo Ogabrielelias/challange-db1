@@ -43,7 +43,9 @@ import androidx.navigation.NavController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.Components.Select
 import br.com.fiap.challange.R
+import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.database.repository.UserRepository
+import br.com.fiap.challange.model.Interest
 import br.com.fiap.challange.model.User
 import br.com.fiap.challange.ui.theme.MainBlue
 import kotlinx.coroutines.launch
@@ -123,6 +125,7 @@ fun RegisterScreen(navController: NavController) {
 fun FormRegister(onSend: (message: String) -> Unit) {
     val context = LocalContext.current
     val userRepository = UserRepository(context)
+    val interestRepository = InterestRepository(context)
 
     var error = remember { mutableStateOf(false) }
 
@@ -288,6 +291,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
 
                     onSend(message)
                 } catch (err: Throwable) {
+                    println(err)
                     onSend("Erro de conexão com o servidor!")
                 }
             },
