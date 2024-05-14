@@ -2,6 +2,7 @@ package br.com.fiap.challange.database.repository
 
 import android.content.Context
 import br.com.fiap.challange.database.dao.AppDatabase
+import br.com.fiap.challange.model.Experience
 import br.com.fiap.challange.model.Interest
 
 class ExperienceRepository(context: Context) {
@@ -20,7 +21,7 @@ class ExperienceRepository(context: Context) {
         return db.delete(interest)
     }
 
-    fun getExperienceById(id: Int): Interest {
+    fun getExperienceById(id: Int): Experience {
         return db.getExperienceById(id)
     }
 }
