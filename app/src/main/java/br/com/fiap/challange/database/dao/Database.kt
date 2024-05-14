@@ -5,13 +5,15 @@
     import androidx.room.Database
     import androidx.room.Room
     import androidx.room.RoomDatabase
+    import br.com.fiap.challange.model.Experience
     import br.com.fiap.challange.model.Interest
 
-    @Database(entities = [User::class, Interest::class], version = 2)
+    @Database(entities = [User::class, Interest::class, Experience::class], version = 2)
     abstract class AppDatabase  : RoomDatabase() {
 
         abstract fun userDao(): UserDAO
         abstract fun interestDao(): InterestDAO
+        abstract fun experienceDao(): ExperienceDAO
 
         companion object {
 
