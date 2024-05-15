@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import br.com.fiap.challange.model.User
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 
 @Dao
 interface UserDAO {
@@ -33,7 +34,7 @@ interface UserDAO {
 
     @Query(
         """
-        SELECT DISTINCT u.*
+        SELECT DISTINCT u.*, e.experience AS user_experience, i.interest AS user_interest
         FROM tb_user u
         LEFT JOIN tb_experience e ON u.id = e.userId
         LEFT JOIN tb_interest i ON u.id = i.userId
@@ -41,7 +42,7 @@ interface UserDAO {
             (:searchTerm IS NULL OR u.name LIKE '%' || :searchTerm || '%' OR e.experience LIKE '%' || :searchTerm || '%' OR i.interest LIKE '%' || :searchTerm || '%')
             AND (:isMentor IS NULL OR u.isMentor = :isMentor)
             AND (:isStudent IS NULL OR u.isStudent = :isStudent)
-            AND (:formation IS NULL OR e.level >= :formation)
+            AND (:formationLevel IS NULL OR e.level >= :formationLevel)
             AND (:experienceLevel IS NULL OR i.level >= :experienceLevel);
     """
     )
@@ -49,9 +50,9 @@ interface UserDAO {
         searchTerm: String?,
         isMentor: Boolean?,
         isStudent: Boolean?,
-        formation: Int?,
+        formationLevel: Int?,
         experienceLevel: Int?
-    ): List<User>
+    ): List<UserWithExperiencesAndInterests>
 
     @Query("""
         SELECT DISTINCT u.*

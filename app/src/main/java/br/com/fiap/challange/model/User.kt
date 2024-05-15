@@ -1,5 +1,6 @@
 package br.com.fiap.challange.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -15,4 +16,18 @@ data class User (
     val genre: String = "",
     val isMentor: Int?,
     val isStudent: Int?
+)
+
+data class UserWithExperiencesAndInterests(
+@Embedded val user: User,
+@Relation(
+    parentColumn = "id",
+    entityColumn = "userId"
+)
+val experiences: List<Experience> = emptyList(),
+@Relation(
+    parentColumn = "id",
+    entityColumn = "userId"
+)
+val interests: List<Interest> = emptyList()
 )

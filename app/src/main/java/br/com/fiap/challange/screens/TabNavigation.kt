@@ -64,7 +64,7 @@ fun TabNavigationScreen(navController: NavHostController) {
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("")) {
+            if (currentRoute in listOf("search")) {
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = White,
@@ -72,13 +72,12 @@ fun TabNavigationScreen(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(White)
-                        .padding(horizontal = 0.dp, vertical = 4.dp)
                         .drawBehind {
                             drawLine(
                                 color = LightBlue,
                                 start = Offset(0f, 0f),
                                 end = Offset(size.width, 0f),
-                                strokeWidth = 1.dp.toPx(),
+                                strokeWidth = 2.dp.toPx(),
                                 cap = StrokeCap.Round
                             )
                         },
@@ -86,18 +85,18 @@ fun TabNavigationScreen(navController: NavHostController) {
                     indicator = {}
                 ) {
                     Tab(
-                        selected = currentRoute == "tab1",
-                        onClick = { navController.navigate("tab1"); currentTab = 0 },
+                        selected = currentRoute == "search",
+                        onClick = { navController.navigate("search"); currentTab = 0 },
                         text = {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
                                     .clip(shape = RoundedCornerShape(40.dp))
-                                    .background(if (currentRoute == "tab1") MainBlue else White)
+                                    .background(if (currentRoute == "search") MainBlue else White)
                                     .size(48.dp),
                                 ) {
                                 Image(
-                                    painter = painterResource(if (currentRoute == "tab1") R.drawable.searchwhite else R.drawable.search),
+                                    painter = painterResource(if (currentRoute == "search") R.drawable.searchwhite else R.drawable.search),
                                     contentDescription = "search",
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -148,9 +147,10 @@ fun TabNavigationScreen(navController: NavHostController) {
             }
         }
     ) {
-        NavHost(navController, startDestination = "login") {
+        NavHost(navController, startDestination = "search") {
             composable("login") { LoginScreen(navController = navController) }
             composable("register") { RegisterScreen(navController = navController) }
+            composable("search") { SearchScreen(navController = navController) }
         }
     }
 }

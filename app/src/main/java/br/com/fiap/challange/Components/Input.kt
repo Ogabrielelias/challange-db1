@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -46,7 +47,8 @@ fun Input(
     type: String? = "",
     frontImage: Int? = null,
     isError: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
 
     var inputIsFocused = remember {
@@ -93,6 +95,7 @@ fun Input(
                             inputIsFocused.value = state.toString()
                         },
                     keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
@@ -134,6 +137,7 @@ fun Input(
                             inputIsFocused.value = state.toString()
                         },
                     keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
                     leadingIcon = inputFrontImg,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,

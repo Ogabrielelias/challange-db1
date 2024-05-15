@@ -3,6 +3,9 @@ package br.com.fiap.challange.database.repository
 import android.content.Context
 import br.com.fiap.challange.database.dao.AppDatabase
 import br.com.fiap.challange.model.User
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserRepository(context: Context) {
 
@@ -26,6 +29,18 @@ class UserRepository(context: Context) {
 
     fun getUserById(id: Int): User {
         return db.getUserById(id)
+    }
+
+    suspend fun searchUsers(
+        searchTerm: String? = null,
+        isMentor: Boolean? = null,
+        isStudent: Boolean? = null,
+        formationLevel: Int? = null,
+        experienceLevel: Int? = null
+    ): List<UserWithExperiencesAndInterests> {
+        return withContext(Dispatchers.IO) {
+            db.searchUsers(searchTerm,isMentor,isStudent,formationLevel,experienceLevel)
+        }
     }
 
     fun getUserByLogin(email:String, senha:String): User {
