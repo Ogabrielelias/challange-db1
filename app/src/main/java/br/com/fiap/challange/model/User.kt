@@ -11,8 +11,8 @@ data class User (
     val name: String = "",
     val email: String = "",
     val password: String = "",
-    val age: String = "",
+    val age: Int ,
     val genre: String = "",
-    val isMentor: Boolean = false,
-    val isStudent: Boolean = false
+    val isMentor: Int?,
+    val isStudent: Int?
 )

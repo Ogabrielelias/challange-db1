@@ -41,8 +41,8 @@ interface UserDAO {
             (:searchTerm IS NULL OR u.name LIKE '%' || :searchTerm || '%' OR e.experience LIKE '%' || :searchTerm || '%' OR i.interest LIKE '%' || :searchTerm || '%')
             AND (:isMentor IS NULL OR u.isMentor = :isMentor)
             AND (:isStudent IS NULL OR u.isStudent = :isStudent)
-            AND (:formation IS NULL OR e.experience = :formation)
-            AND (:experienceLevel IS NULL OR e.level >= :experienceLevel);
+            AND (:formation IS NULL OR e.level >= :formation)
+            AND (:experienceLevel IS NULL OR i.level >= :experienceLevel);
     """
     )
     fun searchUsers(
@@ -77,7 +77,7 @@ interface UserDAO {
         LEFT JOIN tb_interest i ON u.id = i.userId
         LEFT JOIN tb_match m ON u.id = m.userStudentId
         WHERE i.interest IN (:interestList)
-          AND NOT (m.studentHasMatch = 1 AND m.mentorHasMatch = 1)
+          AND NOT (m.studentHasMatch != null AND m.mentorHasMatch != null)
         ORDER BY 
           CASE 
             WHEN e.experience IN (:interestList) AND m.studentHasMatch = 1 THEN 1

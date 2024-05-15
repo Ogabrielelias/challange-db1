@@ -258,16 +258,16 @@ fun FormRegister(onSend: (message: String) -> Unit) {
 
                         if (user == null) {
                             val isStudent =
-                                generoValue.value == "Aluno" || generoValue.value == "Ambos"
+                                if (generoValue.value == "Aluno" || generoValue.value == "Ambos") 1 else 0
                             val isMentor =
-                                generoValue.value == "Mentor" || generoValue.value == "Ambos"
+                                if (generoValue.value == "Mentor" || generoValue.value == "Ambos") 1 else 0
 
                             userRepository.save(
                                 User(
                                     name = nomeValue.value,
                                     email = emailValue.value,
                                     password = senhaValue.value,
-                                    age = idadeValue.value,
+                                    age = idadeValue.value.toInt(),
                                     genre = generoValue.value,
                                     isStudent = isStudent,
                                     isMentor = isMentor

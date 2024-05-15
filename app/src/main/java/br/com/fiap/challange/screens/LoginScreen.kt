@@ -201,7 +201,6 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
         }
 
         Button(
-            enabled = !buttonDisabled.value,
             onClick = { ->
                 try {
                     val user = userRepository.getUserByLogin(
