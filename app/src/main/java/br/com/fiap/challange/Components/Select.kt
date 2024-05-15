@@ -1,10 +1,12 @@
 package br.com.fiap.challange.Components
 
 import android.widget.Toast
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,22 +24,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import br.com.fiap.challange.ui.theme.Gray
 import br.com.fiap.challange.ui.theme.MainBlue
+
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.window.PopupProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Select(
     items: List<String>,
     label: String? = null,
-    onSelect: ((value:String) -> Unit)
+    onSelect: ((value: String) -> Unit),
+    writableSelect: Boolean = false
 ) {
-    val context = LocalContext.current
+
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(
-        if (label != null) label else items[0]
-    ) }
+    var selectedText by remember {
+        mutableStateOf(
+            if (label != null) "" else items[0]
+        )
+    }
 
     ExposedDropdownMenuBox(
         modifier = Modifier.fillMaxWidth(),
@@ -48,8 +59,18 @@ fun Select(
     ) {
         OutlinedTextField(
             value = selectedText,
-            onValueChange = {},
-            readOnly = true,
+            onValueChange = { value ->
+                if (writableSelect) {
+                    selectedText = value
+                    expanded = true
+                }
+            },
+            label = {
+                if (label != null) {
+                    Text(label)
+                }
+            },
+            readOnly = !writableSelect,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
@@ -60,7 +81,7 @@ fun Select(
                 focusedIndicatorColor = MainBlue,
                 containerColor = Color.Transparent,
                 unfocusedIndicatorColor = Gray
-            )
+            ),
         )
 
         DropdownMenu(
@@ -68,16 +89,27 @@ fun Select(
                 .exposedDropdownSize()
                 .fillMaxWidth(),
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            properties = PopupProperties(focusable = false)
         ) {
-            items.forEach { item ->
+            items.filter { item ->
+                if (writableSelect && selectedText.length > 0) {
+                    (item.contains(selectedText, ignoreCase = true))
+                } else {
+                    true
+                }
+            }.forEach { item ->
                 DropdownMenuItem(
                     modifier = Modifier.fillMaxWidth(),
                     text = { Text(text = item) },
                     onClick = {
-                        selectedText = item
-                        expanded = false
                         onSelect(item)
+                        if(writableSelect){
+                            selectedText = ""
+                        }else{
+                            selectedText = item
+                        }
+                        expanded = false
                     }
                 )
             }

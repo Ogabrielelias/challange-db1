@@ -190,7 +190,8 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 onSelect = { value ->
                     generoValue.value = value
                     error.value = false
-                }
+                },
+                writableSelect = true
             )
 
             Input(
