@@ -55,35 +55,36 @@ interface UserDAO {
 
     @Query("""
         SELECT DISTINCT u.*
-        FROM tb_user u
-        LEFT JOIN tb_interest i ON u.id = i.userId
-        LEFT JOIN tb_experience e ON u.id = e.userId
-        LEFT JOIN tb_match m ON u.id = m.userStudentId
-        WHERE e.experience IN (:experienceList)
-          AND NOT (m.studentHasMatch = 1 AND m.mentorHasMatch = 1)
-        ORDER BY 
-          CASE 
-            WHEN i.interest IN (:experienceList) AND m.studentHasMatch = 1 THEN 1
-            WHEN i.interest IN (:experienceList) THEN 2
-            ELSE 3
-          END;
-    """)
-    fun getStudentsToMatchFromExperiences(experienceList: List<String>): List<User>
-
-    @Query("""
-        SELECT DISTINCT u.*
-        FROM tb_user u
-        LEFT JOIN tb_experience e ON u.id = e.userId
-        LEFT JOIN tb_interest i ON u.id = i.userId
-        LEFT JOIN tb_match m ON u.id = m.userStudentId
-        WHERE i.interest IN (:interestList)
-          AND NOT (m.studentHasMatch != null AND m.mentorHasMatch != null)
-        ORDER BY 
-          CASE 
-            WHEN e.experience IN (:interestList) AND m.studentHasMatch = 1 THEN 1
-            WHEN e.experience IN (:interestList) THEN 2
-            ELSE 3
-          END;
+            FROM tb_user u
+            LEFT JOIN tb_interest i ON u.id = i.userId
+            LEFT JOIN tb_experience e ON u.id = e.userId
+            LEFT JOIN tb_match m ON u.id = m.userStudentId
+            WHERE e.experience IN (:interestList)
+              AND NOT (m.studentHasMatch = 1 AND m.mentorHasMatch = 1)
+            ORDER BY 
+              CASE 
+                WHEN (i.interest IN (:interestList) AND m.studentHasMatch = 1) THEN 1
+                WHEN i.interest IN (:interestList) THEN 2
+                ELSE 3
+              END
+              
     """)
     fun getMentorToMatchFromInterests(interestList: List<String>): List<User>
+
+    @Query("""
+        SELECT DISTINCT u.*, i.*
+        FROM tb_user u
+        LEFT JOIN tb_experience e ON u.id = e.userId
+        LEFT JOIN tb_interest i ON u.id = i.userId
+        LEFT JOIN tb_match m ON u.id = m.userStudentId
+        WHERE i.interest IN (:experienceList)
+        AND (m.studentHasMatch IS NULL OR m.mentorHasMatch IS NULL)
+        ORDER BY 
+        CASE 
+            WHEN e.experience IN (:experienceList) AND m.studentHasMatch = 1 THEN 1
+            WHEN e.experience IN (:experienceList) THEN 2
+            ELSE 3
+        END;
+    """)
+    fun getStudentsToMatchFromExperiences(experienceList: List<String>): List<User>
 }
