@@ -77,7 +77,7 @@ fun Input(
         OutlinedTextFieldBackground(
             Color.White,
         ) {
-            if (type === "password") {
+            if (type == "password") {
                 OutlinedTextField(
                     label = { if (label != null) Text(label) },
                     placeholder = { Text(placeholder) },
