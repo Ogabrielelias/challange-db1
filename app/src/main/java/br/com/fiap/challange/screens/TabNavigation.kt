@@ -1,16 +1,22 @@
 package br.com.fiap.challange.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -21,16 +27,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import br.com.fiap.challange.R
 import br.com.fiap.challange.ui.theme.Blue70
 import br.com.fiap.challange.ui.theme.Gray50
+import br.com.fiap.challange.ui.theme.LightBlue
+import br.com.fiap.challange.ui.theme.MainBlue
+import br.com.fiap.challange.ui.theme.White
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,40 +63,85 @@ fun TabNavigationScreen(navController: NavHostController) {
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
-            println(navController.currentDestination?.route)
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
             if (currentRoute in listOf("")) {
                 TabRow(
                     selectedTabIndex = currentTab,
-                    contentColor = Gray50,
-                    containerColor = Blue70,
+                    contentColor = White,
+                    containerColor = White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Blue70)
-                        .padding(all = 16.dp),
+                        .background(White)
+                        .padding(horizontal = 0.dp, vertical = 4.dp)
+                        .drawBehind {
+                            drawLine(
+                                color = LightBlue,
+                                start = Offset(0f, 0f),
+                                end = Offset(size.width, 0f),
+                                strokeWidth = 1.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        },
+                    divider = {},
+                    indicator = {}
                 ) {
                     Tab(
-                        selected = currentRoute == "",
-                        onClick = { navController.navigate(""); currentTab = 0 },
+                        selected = currentRoute == "tab1",
+                        onClick = { navController.navigate("tab1"); currentTab = 0 },
                         text = {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Star",
-                                tint = Color(0XFF0D65FB),
-                                modifier = Modifier.size(25.dp)
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(40.dp))
+                                    .background(if (currentRoute == "tab1") MainBlue else White)
+                                    .size(48.dp),
+                                ) {
+                                Image(
+                                    painter = painterResource(if (currentRoute == "tab1") R.drawable.searchwhite else R.drawable.search),
+                                    contentDescription = "search",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        },
+                    )
+                    Tab(
+                        selected = currentRoute == "tab2",
+                        onClick = { navController.navigate("tab2"); currentTab = 1 },
+                        text = {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(48.dp))
+                                    .background(if (currentRoute == "tab2") MainBlue else White)
+                                    .size(40.dp),
+
+                                ) {
+                                Image(
+                                    painter = painterResource(if (currentRoute == "tab2") R.drawable.compasswhite else R.drawable.compass),
+                                    contentDescription = "compass",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     )
                     Tab(
-                        selected = currentRoute == "",
-                        onClick = { navController.navigate(""); currentTab = 1 },
+                        selected = currentRoute == "tab3",
+                        onClick = { navController.navigate("tab3"); currentTab = 1 },
                         text = {
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = "Heart Icon",
-                                tint = Color(0XFF0D65FB),
-                                modifier = Modifier.size(25.dp)
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .clip(shape = RoundedCornerShape(48.dp))
+                                    .background(if (currentRoute == "tab3") MainBlue else White)
+                                    .size(40.dp),
+
+                                ) {
+                                Image(
+                                    painter = painterResource(if (currentRoute == "tab3") R.drawable.bellwhite else R.drawable.bell),
+                                    contentDescription = "bell",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     )
                 }

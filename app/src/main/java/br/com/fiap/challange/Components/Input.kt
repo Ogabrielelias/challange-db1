@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.challange.R
@@ -38,14 +40,16 @@ import br.com.fiap.challange.ui.theme.MainBlue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Input(
-    label:String? = null,
+    label: String? = null,
     placeholder: String = "",
-    value:String,
-    onChange:(value:String) -> Unit,
-    type: String = "",
+    value: String,
+    onChange: (value: String) -> Unit,
+    type: String? = "",
     frontImage: Int? = null,
-    isError: Boolean = false
-){
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+    keyboardAction: KeyboardActions = KeyboardActions(onDone = {})
+) {
 
     var inputIsFocused = remember {
         mutableStateOf("")
@@ -54,32 +58,44 @@ fun Input(
     var password = remember {
         mutableStateOf("")
     }
-    var passwordVisible : Boolean by remember{
+    var passwordVisible: Boolean by remember {
         mutableStateOf(false)
     }
 
+    var inputFrontImg: (@Composable () -> Unit)? = if (frontImage != null) {
+        {
+            Image(
+                painter = painterResource(frontImage),
+                contentDescription = null,
+                Modifier
+                    .size(24.dp)
+            )
+        }
+    } else null
+
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-    ){
+    ) {
         OutlinedTextFieldBackground(
             Color.White,
         ) {
-            if(type === "password"){
+            if (type === "password") {
                 OutlinedTextField(
-                    label= { if (label!=null) Text(label) },
-                    placeholder={ Text(placeholder) },
+                    label = { if (label != null) Text(label) },
+                    placeholder = { Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
                         onChange(value)
                     },
                     shape = RoundedCornerShape(10.dp),
-                    isError=isError,
+                    isError = isError,
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { state ->
                             inputIsFocused.value = state.toString()
                         },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardAction,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
@@ -87,15 +103,7 @@ fun Input(
                         unfocusedIndicatorColor = Gray
                     ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    leadingIcon = {
-                        if (frontImage != null){
-                            Image(
-                            painter = painterResource(frontImage),
-                            contentDescription = null,
-                            Modifier
-                                .size(24.dp)
-                        )}else{null}
-                    },
+                    leadingIcon = inputFrontImg,
                     trailingIcon = {
                         IconButton(
                             onClick = {
@@ -103,7 +111,7 @@ fun Input(
                             }
                         ) {
                             var image = R.drawable.eye
-                            if(passwordVisible) image = R.drawable.eyeoff
+                            if (passwordVisible) image = R.drawable.eyeoff
                             Image(
                                 painter = painterResource(image),
                                 contentDescription = null,
@@ -113,10 +121,10 @@ fun Input(
                         }
                     }
                 )
-            }else {
+            } else {
                 OutlinedTextField(
-                    label= { if (label!=null) Text(label) },
-                    placeholder={ Text(placeholder) },
+                    label = { if (label != null) Text(label) },
+                    placeholder = { Text(placeholder) },
                     value = value,
                     onValueChange = { value ->
                         onChange(value)
@@ -128,16 +136,9 @@ fun Input(
                         .onFocusChanged { state ->
                             inputIsFocused.value = state.toString()
                         },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    leadingIcon = {
-                        if (frontImage != null){
-                            Image(
-                                painter = painterResource(frontImage),
-                                contentDescription = null,
-                                Modifier
-                                    .size(24.dp)
-                            )}else{null}
-                    },
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardAction,
+                    leadingIcon = inputFrontImg,
                     colors = TextFieldDefaults.textFieldColors(
                         cursorColor = Color.Black,
                         focusedIndicatorColor = MainBlue,
@@ -149,6 +150,7 @@ fun Input(
         }
     }
 }
+
 @Composable
 fun OutlinedTextFieldBackground(
     color: Color,
