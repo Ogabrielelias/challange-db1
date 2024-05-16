@@ -24,12 +24,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -47,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,7 +57,6 @@ import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
 import br.com.fiap.challange.constants.userRoleList
 import br.com.fiap.challange.database.repository.UserRepository
-import br.com.fiap.challange.model.User
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.ui.theme.Black
 import br.com.fiap.challange.ui.theme.Gray
@@ -77,11 +73,46 @@ fun SearchScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    var usersList = remember { mutableStateListOf<UserWithExperiencesAndInterests>() }
-    var searchValue = remember { mutableStateOf("") }
+    val usersList = remember { mutableStateListOf<UserWithExperiencesAndInterests>() }
+    val searchValue = remember { mutableStateOf("") }
+    val openFilter = remember { mutableStateOf(false) }
+    val roleFilter = remember { mutableStateOf<String?>(null) }
+    val experienceFilter = remember { mutableStateOf<Int?>(null) }
+    val interestFilter = remember { mutableStateOf<Int?>(null) }
 
 
-    filterModal()
+    if (openFilter.value) {
+        FilterModal(
+            role = roleFilter.value,
+            exp = experienceFilter.value,
+            int = interestFilter.value,
+            onClose = { openFilter.value = false },
+            onApplyFilter = { role, exp, int ->
+                val expValue = if (exp == 1) null else exp
+                val intValue = if (int == 1) null else int
+
+                experienceFilter.value = expValue
+                interestFilter.value = intValue
+                roleFilter.value = if (role == "Ambos") null else role
+
+                val isStudent: Int? = if (role == "Aluno") 1 else null
+                val isMentor: Int? = if (role == "Mentor") 1 else null
+
+                search(
+                    context = context,
+                    onSearch = { users ->
+                        usersList.clear()
+                        usersList.addAll(users)
+                    },
+                    searchTerm = searchValue.value.ifBlank { null },
+                    isMentor = isMentor,
+                    isStudent = isStudent,
+                    formationLevel = expValue,
+                    experienceLevel = intValue
+                )
+            }
+        )
+    }
     Scaffold(
         containerColor = Color.Transparent,
         snackbarHost = {
@@ -111,18 +142,25 @@ fun SearchScreen(navController: NavController) {
                         frontImage = R.drawable.search,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
+                            val isStudent: Int? = if (roleFilter.value == "Aluno") 1 else null
+                            val isMentor: Int? = if (roleFilter.value == "Mentor") 1 else null
+
                             search(
-                                context,
+                                context = context,
                                 onSearch = { users ->
                                     usersList.clear()
                                     usersList.addAll(users)
                                 },
-                                searchTerm = searchValue.value
+                                searchTerm = searchValue.value.ifBlank { null },
+                                isMentor = isMentor,
+                                isStudent = isStudent,
+                                formationLevel = experienceFilter.value,
+                                experienceLevel = interestFilter.value
                             )
                         })
                     )
                     OutlinedButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { openFilter.value = true },
                         shape = RoundedCornerShape(8.dp),
                     ) {
                         Text("Exibir filtros", color = Black)
@@ -138,7 +176,7 @@ fun SearchScreen(navController: NavController) {
             ) {
                 if (usersList.isNotEmpty()) {
                     usersList.forEach { user ->
-                        userSearchCard(
+                        UserSearchCard(
                             name = user.user.name,
                             experiences = user.experiences.map { exp -> exp.experience },
                             interests = user.interests.map { int -> int.interest }
@@ -152,7 +190,7 @@ fun SearchScreen(navController: NavController) {
 }
 
 @Composable
-fun userSearchCard(
+fun UserSearchCard(
     name: String,
     experiences: List<String>? = null,
     interests: List<String>? = null
@@ -179,18 +217,18 @@ fun userSearchCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            if (experiences.isNullOrEmpty()) {
+            if (experiences != null && experiences.isNotEmpty()) {
                 Text(
-                    "Experiências: ${experiences?.joinToString(separator = ", ")}",
+                    "Experiências: ${experiences.joinToString(separator = ", ")}",
                     fontSize = 14.sp,
                     color = Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            if (interests.isNullOrEmpty()) {
+            if (interests != null && interests.isNotEmpty()) {
                 Text(
-                    "Interesses: ${interests?.joinToString(separator = ", ")}",
+                    "Interesses: ${interests.joinToString(separator = ", ")}",
                     fontSize = 14.sp,
                     color = Gray,
                     maxLines = 1,
@@ -202,7 +240,16 @@ fun userSearchCard(
 }
 
 @Composable
-fun filterModal() {
+fun FilterModal(
+    onApplyFilter: ((role: String, experience: Int, interest: Int) -> Unit)? = null,
+    onClose: () -> Unit,
+    role: String? = null,
+    exp: Int? = null,
+    int: Int? = null
+) {
+    var roleValue = remember { mutableStateOf(role ?: "Ambos") }
+    var experienceValue = remember { mutableStateOf(exp ?: 1) }
+    var interestValue = remember { mutableStateOf(int ?: 1) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -247,7 +294,7 @@ fun filterModal() {
                                 .size(32.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures {
-
+                                        onClose()
                                     }
                                 }
                         )
@@ -264,7 +311,10 @@ fun filterModal() {
                             fontWeight = FontWeight.Medium,
                             fontSize = 20.sp
                         )
-                        Select(items = userRoleList, onSelect = {})
+                        Select(
+                            value = roleValue.value,
+                            items = userRoleList,
+                            onSelect = { value -> roleValue.value = value })
                     }
                     Column {
                         Text(
@@ -273,8 +323,11 @@ fun filterModal() {
                             fontSize = 20.sp
                         )
                         Select(
+                            value = ExperiencesLevelList.get(experienceValue.value - 1),
                             items = ExperiencesLevelList,
-                            onSelect = {})
+                            onSelect = { value ->
+                                experienceValue.value = ExperiencesLevelList.indexOf(value) + 1
+                            })
                     }
                     Column {
                         Text(
@@ -283,14 +336,26 @@ fun filterModal() {
                             fontSize = 20.sp
                         )
                         Select(
-                            items = InterestsLevelList, onSelect = {})
+                            value = InterestsLevelList.get(experienceValue.value - 1),
+                            items = InterestsLevelList,
+                            onSelect = { value ->
+                                interestValue.value = InterestsLevelList.indexOf(value) + 1
+                            })
                     }
                 }
             }
-            
+
             Column {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        if (onApplyFilter != null) onApplyFilter(
+                            roleValue.value,
+                            experienceValue.value,
+                            interestValue.value
+                        )
+
+                        onClose()
+                    },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(16.dp),
@@ -306,7 +371,7 @@ fun filterModal() {
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(64.dp))
             }
 
@@ -318,8 +383,8 @@ fun search(
     context: Context,
     onSearch: (result: List<UserWithExperiencesAndInterests>) -> Unit,
     searchTerm: String? = null,
-    isMentor: Boolean? = null,
-    isStudent: Boolean? = null,
+    isMentor: Int? = null,
+    isStudent: Int? = null,
     formationLevel: Int? = null,
     experienceLevel: Int? = null
 ) {

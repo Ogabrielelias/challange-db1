@@ -40,13 +40,14 @@ fun Select(
     items: List<String>,
     label: String? = null,
     onSelect: ((value: String) -> Unit),
-    writableSelect: Boolean = false
+    writableSelect: Boolean = false,
+    value: String? = null
 ) {
 
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember {
         mutableStateOf(
-            if (label != null) "" else items[0]
+            value?: if (label != null) "" else items[0]
         )
     }
 
@@ -58,7 +59,7 @@ fun Select(
         }
     ) {
         OutlinedTextField(
-            value = selectedText,
+            value = value?:selectedText,
             onValueChange = { value ->
                 if (writableSelect) {
                     selectedText = value

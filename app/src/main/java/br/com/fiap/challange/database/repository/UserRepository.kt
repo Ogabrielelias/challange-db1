@@ -33,8 +33,8 @@ class UserRepository(context: Context) {
 
     suspend fun searchUsers(
         searchTerm: String? = null,
-        isMentor: Boolean? = null,
-        isStudent: Boolean? = null,
+        isMentor: Int? = null,
+        isStudent: Int? = null,
         formationLevel: Int? = null,
         experienceLevel: Int? = null
     ): List<UserWithExperiencesAndInterests> {

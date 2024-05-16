@@ -40,16 +40,16 @@ interface UserDAO {
         LEFT JOIN tb_interest i ON u.id = i.userId
         WHERE 
             (:searchTerm IS NULL OR u.name LIKE '%' || :searchTerm || '%' OR e.experience LIKE '%' || :searchTerm || '%' OR i.interest LIKE '%' || :searchTerm || '%')
-            AND (:isMentor IS NULL OR u.isMentor = :isMentor)
-            AND (:isStudent IS NULL OR u.isStudent = :isStudent)
+            AND (:isMentor IS NULL OR (u.isMentor = :isMentor AND (:searchTerm IS NULL OR e.experience LIKE '%' || :searchTerm || '%')))
+            AND (:isStudent IS NULL OR (u.isStudent = :isStudent AND (:searchTerm IS NULL OR i.interest LIKE '%' || :searchTerm || '%')))
             AND (:formationLevel IS NULL OR e.level >= :formationLevel)
             AND (:experienceLevel IS NULL OR i.level >= :experienceLevel);
     """
     )
     fun searchUsers(
         searchTerm: String?,
-        isMentor: Boolean?,
-        isStudent: Boolean?,
+        isMentor: Int?,
+        isStudent: Int?,
         formationLevel: Int?,
         experienceLevel: Int?
     ): List<UserWithExperiencesAndInterests>
