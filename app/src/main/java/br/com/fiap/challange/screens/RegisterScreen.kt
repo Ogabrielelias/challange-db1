@@ -43,6 +43,7 @@ import androidx.navigation.NavController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.Components.Select
 import br.com.fiap.challange.R
+import br.com.fiap.challange.constants.userRoleList
 import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.database.repository.UserRepository
 import br.com.fiap.challange.model.Interest
@@ -227,7 +228,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
 
             Select(
                 label = "Deseja ser mentor e/ou aluno?",
-                items = listOf("Mentor", "Aluno", "Ambos"),
+                items = userRoleList,
                 onSelect = { value ->
                     tipoValue.value = value
                     error.value = false
