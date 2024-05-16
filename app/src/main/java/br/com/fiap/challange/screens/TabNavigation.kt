@@ -147,7 +147,7 @@ fun TabNavigationScreen(navController: NavHostController) {
             }
         }
     ) {
-        NavHost(navController, startDestination = "search") {
+        NavHost(navController, startDestination = "login") {
             composable("login") { LoginScreen(navController = navController) }
             composable("register") { RegisterScreen(navController = navController) }
             composable("search") { SearchScreen(navController = navController) }

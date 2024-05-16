@@ -43,8 +43,10 @@ class UserRepository(context: Context) {
         }
     }
 
-    fun getUserByLogin(email:String, senha:String): User {
-        return db.getUserByLogin(email, senha)
+    suspend fun getUserByLogin(email:String, senha:String): User {
+        return withContext(Dispatchers.IO) {
+            db.getUserByLogin(email, senha)
+        }
     }
 
     fun getUserByEmail(email:String): User {

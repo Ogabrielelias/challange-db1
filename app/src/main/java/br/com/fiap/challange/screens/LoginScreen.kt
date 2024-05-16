@@ -1,6 +1,7 @@
 package br.com.fiap.challange.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.compose.foundation.Image
@@ -43,7 +44,12 @@ import androidx.navigation.NavController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.R
 import br.com.fiap.challange.database.repository.UserRepository
+import br.com.fiap.challange.model.User
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.ui.theme.MainBlue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -104,7 +110,7 @@ fun LoginScreen(navController: NavController) {
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
-                        navController.navigate("register")
+                        navController.navigate("search")
                     }
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -148,7 +154,7 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
 @Composable
 fun FormLogin(onSend: (status: Boolean) -> Unit) {
     val context = LocalContext.current
-    val userRepository = UserRepository(context)
+    val scope = rememberCoroutineScope()
 
     var error = remember { mutableStateOf(false) }
 
@@ -203,19 +209,22 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
         Button(
             onClick = { ->
                 try {
-                    val user = userRepository.getUserByLogin(
-                        email = emailValue.value,
-                        senha = senhaValue.value
-                    )
+                    scope.launch {
+                        val user: User = login(
+                            context = context,
+                            email = emailValue.value,
+                            senha = senhaValue.value
+                        )
 
-                    if (user == null) {
-                        error.value = true
-                    } else {
-                        emailValue.value = ""
-                        senhaValue.value = ""
+                        if (user == null) {
+                            error.value = true
+                        } else {
+                            emailValue.value = ""
+                            senhaValue.value = ""
+                        }
+
+                        onSend(user != null)
                     }
-
-                    onSend(user != null)
                 } catch (err: Throwable) {
                     println(err)
                 }
@@ -236,4 +245,18 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
             )
         }
     }
+}
+
+suspend fun login(
+    context: Context,
+    email: String,
+    senha: String
+): User {
+    val userRepository = UserRepository(context)
+    val user = userRepository.getUserByLogin(
+        email = email,
+        senha = senha
+    )
+
+    return (user)
 }
