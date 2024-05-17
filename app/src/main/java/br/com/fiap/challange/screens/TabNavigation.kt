@@ -137,9 +137,10 @@ fun TabNavigationScreen(navController: NavHostController) {
             composable("login") { LoginScreen(navController = navController) }
             composable("register") { RegisterScreen(navController = navController) }
             composable("search") { SearchScreen(navController = navController) }
-            composable("interests") { DescribeInterestsScreen(navController = navController) }
-            composable("experiences") { DescribeExperienceScreen(navController = navController) }
-
+            composable("describIinterests") { DescribeInterestsScreen(navController = navController) }
+            composable("describeExperiences") { DescribeExperienceScreen(navController = navController) }
+            composable("selectInterest") { SelectInterestsScreen(navController = navController) }
+            composable("selectExperience") { SelectExperiencesScreen(navController = navController) }
         }
     }
 }

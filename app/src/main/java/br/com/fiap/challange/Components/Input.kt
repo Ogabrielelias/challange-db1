@@ -55,9 +55,6 @@ fun Input(
         mutableStateOf("")
     }
 
-    var password = remember {
-        mutableStateOf("")
-    }
     var passwordVisible: Boolean by remember {
         mutableStateOf(false)
     }
