@@ -48,7 +48,8 @@ fun Input(
     frontImage: Int? = null,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-    keyboardActions: KeyboardActions = KeyboardActions()
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    singleLine: Boolean = false
 ) {
 
     var inputIsFocused = remember {
@@ -84,6 +85,7 @@ fun Input(
                     label = { if (label != null) Text(label) },
                     placeholder = { Text(placeholder) },
                     value = value,
+                    singleLine = singleLine,
                     onValueChange = { value ->
                         onChange(value)
                     },
@@ -126,6 +128,7 @@ fun Input(
                     label = { if (label != null) Text(label) },
                     placeholder = { Text(placeholder) },
                     value = value,
+                    singleLine = singleLine,
                     onValueChange = { value ->
                         onChange(value)
                     },

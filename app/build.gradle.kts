@@ -70,4 +70,5 @@ dependencies {
     implementation("androidx.room:room-runtime:2.5.2")
     annotationProcessor("androidx.room:room-compiler:2.5.2")
     kapt("androidx.room:room-compiler:2.5.2")
+    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
 }

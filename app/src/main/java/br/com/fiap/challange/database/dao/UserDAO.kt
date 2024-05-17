@@ -43,7 +43,7 @@ interface UserDAO {
             AND (:isMentor IS NULL OR (u.isMentor = :isMentor AND (:searchTerm IS NULL OR e.experience LIKE '%' || :searchTerm || '%')))
             AND (:isStudent IS NULL OR (u.isStudent = :isStudent AND (:searchTerm IS NULL OR i.interest LIKE '%' || :searchTerm || '%')))
             AND (:formationLevel IS NULL OR e.level >= :formationLevel)
-            AND (:experienceLevel IS NULL OR i.level >= :experienceLevel);
+            AND (:experienceLevel IS NULL OR i.level <= :experienceLevel);
     """
     )
     fun searchUsers(
