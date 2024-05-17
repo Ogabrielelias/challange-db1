@@ -58,13 +58,13 @@ import br.com.fiap.challange.ui.theme.MainBlue
 
 
 @Composable
-fun SelectInterestsScreen(navController: NavHostController) {
-    InterestsScreen()
+fun SelectTeachersScreen(navController: NavHostController) {
+    TeachersScreen()
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun InterestsScreen() {
+fun TeachersScreen() {
     val texto = remember {
         mutableStateOf("")
     }
@@ -97,7 +97,7 @@ fun InterestsScreen() {
         Row {
 
             Text(
-                "Quais assuntos deseja aprender?",
+                "Quais assuntos deseja ministrar aulas?",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -106,7 +106,7 @@ fun InterestsScreen() {
         }
         Input(
             value = texto.value, onChange = { value -> texto.value = value },
-            placeholder = "Digite seus interesses",
+            placeholder = "Digite suas experiências.",
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardAction = KeyboardActions(
                 onDone = {
@@ -164,13 +164,13 @@ fun InterestsScreen() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun SelectInterestsPreview() {
-    InterestsScreen()
+fun TeachersInterestsPreview() {
+    TeachersScreen()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputChipExample(
+fun InputChipExample2(
     text: String,
     onDismiss: () -> Unit,
 
