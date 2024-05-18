@@ -5,3 +5,17 @@ val ExperiencesLevelList = listOf("Nenhuma", "Autônomo", "Graduado", "Mestrado"
 val InterestsLevelList = listOf("Nenhum", "Básico", "Intermediário", "Avançado", "Especialista")
 
 val userRoleList = listOf("Ambos", "Aluno", "Mentor")
+
+val interesstsList = listOf(
+    "Matemática",
+    "Química",
+    "Física",
+    "Biologia",
+    "Programação",
+    "Música",
+    "Arte",
+    "Literatura",
+    "História",
+    "Filosofia",
+    "Culinária"
+)
