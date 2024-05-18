@@ -50,7 +50,7 @@ fun TabNavigationScreen(navController: NavHostController) {
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search")) {
+            if (currentRoute in listOf("search", "profile")) {
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = White,
@@ -133,12 +133,13 @@ fun TabNavigationScreen(navController: NavHostController) {
             }
         }
     ) {
-        NavHost(navController, startDestination = "login") {
+        NavHost(navController, startDestination = "profile") {
             composable("login") { LoginScreen(navController = navController) }
             composable("register") { RegisterScreen(navController = navController) }
             composable("search") { SearchScreen(navController = navController) }
             composable("interests") { DescribeInterestsScreen(navController = navController) }
             composable("experiences") { DescribeExperienceScreen(navController = navController) }
+            composable("profile") { ProfileScreen(navController = navController) }
 
         }
     }

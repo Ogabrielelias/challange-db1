@@ -87,9 +87,15 @@ fun DescribeExperienceScreen(navController: NavHostController) {
                     textAlign = TextAlign.Start
                 )
 
-                DescribeExperiences(experiences = "Matemática", InputValue = ExperienceValue["Matemática"], onChange = {value -> ExperienceValue["Matemática"] = (value) })
-                DescribeExperiences(experiences = "Ciência da Computação", InputValue = ExperienceValue["Ciência da Computação"], onChange = {value -> ExperienceValue["Ciência da Computação"] = (value) })
-                DescribeExperiences(experiences = "Física", InputValue = ExperienceValue["Física"], onChange = {value -> ExperienceValue["Física"] = (value) })
+                DescribeExperiences(experiences = "Matemática",
+                    InputValue = ExperienceValue["Matemática"],
+                    onChange = {value -> ExperienceValue["Matemática"] = (value) })
+                DescribeExperiences(experiences = "Ciência da Computação",
+                    InputValue = ExperienceValue["Ciência da Computação"],
+                    onChange = {value -> ExperienceValue["Ciência da Computação"] = (value) })
+                DescribeExperiences(experiences = "Física",
+                    InputValue = ExperienceValue["Física"],
+                    onChange = {value -> ExperienceValue["Física"] = (value) })
 
 
                 Button(onClick = { /*TODO*/ },
