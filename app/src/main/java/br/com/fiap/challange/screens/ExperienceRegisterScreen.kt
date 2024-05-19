@@ -26,6 +26,7 @@ import br.com.fiap.challange.database.repository.ExperienceRepository
 import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.model.Experience
 import br.com.fiap.challange.model.Interest
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) {
+fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, user: UserWithExperiencesAndInterests?) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val experienceRepository = remember { ExperienceRepository(context) }
@@ -44,11 +45,10 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) 
     val snackbarHostState = remember { SnackbarHostState() }
     val isLoading = remember { mutableStateOf(true) }
 
-    LaunchedEffect(userId) {
-        userId?.let {
-            val experiences = experienceRepository.getExperiencesByUserId(it.toLong())
-            hasExperiences.value = experiences.isNotEmpty()
-            if(experiences.isEmpty()) isLoading.value = false
+    LaunchedEffect(user) {
+        user?.let {
+            hasExperiences.value = user.experiences.isNotEmpty()
+            if(user.experiences.isEmpty()) isLoading.value = false
         }
     }
     Scaffold(
@@ -65,7 +65,7 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) 
                 CircularProgressIndicator()
             }
         }
-        if (userId !== null) {
+        if (userId !== null && user != null) {
             if (!hasExperiences.value) {
                 when (step.value) {
                     1 -> SelectExperiencesScreen(onNext = { experiences ->
@@ -130,7 +130,7 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) 
                     )
                 }
             } else {
-                navController.navigate("search")
+                navController.navigate("match")
             }
         }else{
             navController.navigate("login")

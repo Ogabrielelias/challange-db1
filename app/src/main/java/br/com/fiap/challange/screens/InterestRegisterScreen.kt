@@ -40,11 +40,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
+fun InterestRegisterScreen(navController: NavHostController, userId: String?, user: UserWithExperiencesAndInterests?) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val userRepository = remember { UserRepository(context) }
     val interestRepository = remember { InterestRepository(context) }
 
     val step = remember { mutableStateOf<Int>(1) }
@@ -54,9 +53,8 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
     val isLoading = remember { mutableStateOf<Boolean>(true) }
     val userValue = remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
 
-    LaunchedEffect(userId) {
-        userId?.let {
-            val user = userRepository.getUserById(it.toLong())
+    LaunchedEffect(user) {
+        user?.let {
             hasInterest.value = user.interests.isNotEmpty()
 
             if (user.interests.isEmpty()) isLoading.value = false
@@ -78,7 +76,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
                 CircularProgressIndicator()
             }
         }
-        if (userId !== null) {
+        if (userId !== null && user != null) {
             if (!hasInterest.value) {
                 when (step.value) {
                     1 -> SelectInterestsScreen(onNext = { interests ->
@@ -157,7 +155,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
                         if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
                             navController.navigate("experienceRegister/${userId}")
                         } else {
-                            navController.navigate("search")
+                            navController.navigate("match")
                         }
                     }
                 }

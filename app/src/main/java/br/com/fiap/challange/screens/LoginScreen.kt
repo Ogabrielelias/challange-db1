@@ -1,5 +1,6 @@
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.TextUtils
@@ -57,7 +58,8 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, userManager: UserManager) {
+
+fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -95,6 +97,7 @@ fun LoginScreen(navController: NavController, userManager: UserManager) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
+
                     Text(
                         "Seja bem-vindo!",
                         fontSize = 28.sp,
@@ -112,15 +115,13 @@ fun LoginScreen(navController: NavController, userManager: UserManager) {
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
+                        sharedViewModel.user = user
                         if (user!!.interests.isEmpty() && user.user.isStudent == 1) {
                             navController.navigate("interestRegister/${user.user.id}")
                         } else if (user.experiences.isEmpty() && user.user.isMentor == 1) {
                             navController.navigate("experienceRegister/${user.user.id}")
                         } else {
-                            navController.navigate("search")
-                            GlobalScope.launch {
-                                userManager.storeUser(user.user.name, user.user.isMentor?: 0, user.user.isStudent?: 0)
-                            }
+                            navController.navigate("match")
                         }
                     }
                     scope.launch {
@@ -268,8 +269,8 @@ suspend fun login(
 ): UserWithExperiencesAndInterests {
     val userRepository = UserRepository(context)
     val user = userRepository.getUserByLogin(
-        email = "alexandre-ferreira@example.com",
-        senha = "admin123"
+        email = email,
+        senha = senha
     )
 
     return (user)

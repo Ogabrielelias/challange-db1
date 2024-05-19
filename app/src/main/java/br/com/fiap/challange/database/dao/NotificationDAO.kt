@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import br.com.fiap.challange.model.Notification
+import br.com.fiap.challange.model.NotificationWithUserNames
 
 @Dao
 interface NotificationDAO {
@@ -18,9 +19,26 @@ interface NotificationDAO {
     @Delete
     fun delete(notification: Notification): Int
 
-    @Query("SELECT * FROM tb_notification WHERE id = :userId")
+    @Query("SELECT * FROM tb_notification WHERE toUserId = :userId")
     fun getNotificationsFromUserId (userId: Long): List<Notification>
+
+    @Query("""
+        SELECT n.*, 
+               u_from.name AS fromUserName, 
+               u_to.name AS toUserName
+        FROM tb_notification n
+        LEFT JOIN tb_user u_from ON n.fromUserId = u_from.id
+        LEFT JOIN tb_user u_to ON n.toUserId = u_to.id
+        WHERE n.toUserId = :userId 
+          AND n.hasSeen = 0 AND n.hasReceived = 0
+        ORDER BY n.id DESC 
+        LIMIT 1
+        """)
+    fun getLastNewNotificationsFromUserId (userId: Long): NotificationWithUserNames
 
     @Query("UPDATE tb_notification SET hasSeen = 1 WHERE toUserId = :userId AND id = :notificationId")
     fun markNotificationAsSeen(userId: Long, notificationId: Long): Int
+
+    @Query("UPDATE tb_notification SET hasReceived = 1 WHERE id = :notificationId")
+    fun markNotificationAsReceived(notificationId: Long): Int
 }

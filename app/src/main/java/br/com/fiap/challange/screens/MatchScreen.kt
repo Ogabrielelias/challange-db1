@@ -1,16 +1,19 @@
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -63,20 +67,169 @@ import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.Purple100
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.asLiveData
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.zIndex
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
+import br.com.fiap.challange.utils.logoutUser
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MatchScreen(navController: NavHostController, userManager: UserManager) {
+fun MatchScreen(
+    navController: NavHostController,
+    user: UserWithExperiencesAndInterests?,
+    sharedViewModel: SharedViewModel
+) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var isClicked by remember { mutableStateOf(false) }
-    var isMentor = 0
-    var isStudent = 0
+    var selected by remember { mutableStateOf("Mentores") }
+    var userValue by remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
 
-    LaunchedEffect(key1 = userManager) {
-        userManager.userIsMentorFlow.collect { isMentor = it }
-        userManager.userIsStudentFlow.collect { isStudent = it }
+    LaunchedEffect(user) {
+        if (user != null) {
+            userValue = user
+            selected = if (user.user.isMentor == 1) "Alunos" else "Mentores"
+        } else {
+            navController.navigate("login")
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+            .zIndex(10f)
+            .padding(16.dp)
+    ) {
+        LogOutButton(
+            navController = navController,
+            sharedViewModel = sharedViewModel
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+            .zIndex(10f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(all = 4.dp)
+                        .border(
+                            2.dp,
+                            Color.Transparent,
+                            CircleShape
+                        )
+                        .width(220.dp)
+                        .background(Purple100, CircleShape)
+                ) {
+                    if (userValue?.user?.isStudent == 1) {
+                        if (selected == "Mentores") {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = if (user?.user?.isMentor == 1 && user.user.isStudent == 1) {
+                                    Modifier
+                                        .padding(all = 8.dp)
+                                        .border(
+                                            2.dp,
+                                            Color.Transparent,
+                                            CircleShape
+                                        )
+                                        .fillMaxWidth(0.5f)
+                                        .background(MainBlue, CircleShape)
+                                } else {
+                                    Modifier
+                                        .padding(all = 8.dp)
+                                        .border(
+                                            2.dp,
+                                            Color.Transparent,
+                                            CircleShape
+                                        )
+                                        .fillMaxWidth()
+                                        .background(MainBlue, CircleShape)
+                                }
+                            ) {
+                                Text(
+                                    text = "Mentores",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                                )
+                            }
+                        } else if (user?.user?.isMentor == 1 && user.user.isStudent == 1) {
+                            Box(
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .background(Color.Transparent)
+                                    .fillMaxWidth(0.5f)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures {
+                                            selected = "Mentores"
+                                        }
+                                    }
+                            )
+                        }
+                    }
+
+                    if (userValue?.user?.isMentor == 1) {
+                        if (selected == "Alunos") {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = if (user?.user?.isMentor == 1 && user.user.isStudent == 1) {
+                                    Modifier
+                                        .padding(all = 8.dp)
+                                        .border(
+                                            2.dp,
+                                            Color.Transparent,
+                                            CircleShape
+                                        )
+                                        .fillMaxWidth(0.9f)
+                                        .background(MainBlue, CircleShape)
+                                } else {
+                                    Modifier
+                                        .padding(all = 8.dp)
+                                        .border(
+                                            2.dp,
+                                            Color.Transparent,
+                                            CircleShape
+                                        )
+                                        .fillMaxWidth()
+                                        .background(MainBlue, CircleShape)
+                                }
+                            ) {
+                                Text(
+                                    text = "Alunos",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                                )
+                            }
+                        } else if (user?.user?.isMentor == 1 && user.user.isStudent == 1) {
+                            Box(
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .background(Color.Transparent)
+                                    .fillMaxWidth(0.9f)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures {
+                                            selected = "Alunos"
+                                        }
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -85,16 +238,7 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
             SnackbarHost(hostState = snackbarHostState)
         }
     ) {
-        Column(Modifier
-            .drawBehind {
-                drawLine(
-                    color = LightBlue,
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height),
-                    strokeWidth = 2.dp.toPx(),
-                    cap = StrokeCap.Round
-                )
-            }) {
+        Column {
             Column(
                 modifier = Modifier
                     .padding(16.dp),
@@ -104,7 +248,7 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
                     modifier = Modifier
                         .padding(
                             bottom = 24.dp,
-                            top = 16.dp,
+                            top = 80.dp,
                             start = 24.dp,
                             end = 24.dp
                         )
@@ -115,110 +259,6 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            LogOutButton()
-
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .padding(all = 4.dp)
-                                    .width(180.dp)
-                                    .border(
-                                        2.dp,
-                                        Color.Transparent,
-                                        CircleShape
-                                    )
-                                    .background(Purple100, CircleShape)
-                            ){
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier
-                                        .padding(all = 8.dp)
-                                        .fillMaxWidth()
-                                        .border(
-                                            2.dp,
-                                            Color.Transparent,
-                                            CircleShape
-                                        )
-                                        .background(MainBlue, CircleShape)
-                                ){
-                                    Text(text = "Alunos", color = Color.White, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-                                }
-                            }
-                            // COMENTÁRIO ABAIXO É O SELECT QUANDO O PERFIL É ALUNO E MENTOR
-//                            Box(
-//                                contentAlignment = Alignment.Center,
-//                                modifier = Modifier
-//                                    .padding(all = 4.dp)
-//                                    .border(
-//                                        2.dp,
-//                                        Color.Transparent,
-//                                        CircleShape
-//                                    )
-//                                    .background(Purple100, CircleShape)
-//                            ) {
-//                                Row(
-//                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-//                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-//                                ) {
-//                                    Box(
-//                                        contentAlignment = Alignment.Center,
-//                                        modifier = Modifier
-//                                            .border(
-//                                                2.dp,
-//                                                Color.Transparent,
-//                                                CircleShape
-//                                            )
-//                                            .background(
-//                                                if (isClicked) Color.Transparent else MainBlue,
-//                                                CircleShape
-//                                            )
-//                                            .clip(CircleShape)
-//                                            .clickable {
-//                                                isClicked = !isClicked
-//                                            }
-//                                    ) {
-//                                        Text(
-//                                            text = "Alunos",
-//                                            color = if (isClicked) Color.Black else Color.White, // Use a variável para a cor do texto
-//                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//                                        )
-//                                    }
-//                                    Box(
-//                                        contentAlignment = Alignment.Center,
-//                                        modifier = Modifier
-//                                            .border(
-//                                                2.dp,
-//                                                Color.Transparent,
-//                                                CircleShape
-//                                            )
-//                                            .background(
-//                                                if (isClicked) MainBlue else Color.Transparent,
-//                                                CircleShape
-//                                            )
-//                                            .clip(CircleShape)
-//                                            .clickable {
-//                                                isClicked = !isClicked
-//                                            }
-//                                    ) {
-//                                        Text(
-//                                            text = "Mentores",
-//                                            color = if (isClicked) Color.White else Color.Black, // Use a variável para a cor do texto
-//                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//                                        )
-//                                    }
-//                                }
-//                            }
-
-                        }
-                        // LINHA ABAIXO DE EXEMPLO USANDO O USER MANAGER
-                        Text(text = if(isMentor == 1) "Sou um mentor" else "sou um estudante")
                         Text(
                             text = "Mateus Santos",
                             fontSize = 40.sp,
@@ -235,36 +275,39 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
                                     )
                                 }
                         )
-
-                        ExperiencesOrInterests(
-                            experienceorinterest = "Experiências",
+                        UserMatchText(
+                            subject = "Matemática",
                             experienceorknow = "experiência",
                             level = "Graduado",
                             describe = "Ao longo da minha jornada como mentor graduado em matemática, tive a oportunidade de guiar alunos desde os conceitos mais básicos até os desafios mais avançados, testemunhando suas jornadas de crescimento e superação. Cada experiência foi única e gratificante, reforçando minha convicção no poder da educação e no impacto transformador que um mentor pode ter na vida de seus alunos."
                         )
-
-                        ExperiencesOrInterests(
-                            experienceorinterest = "Interesses",
-                            experienceorknow = "conhecimento",
-                            level = "Básico",
-                            describe = "Sei realizar operações aritméticas simples, como adição, subtração, multiplicação e divisão, além de resolver equações lineares básicas e entender conceitos fundamentais de frações e decimais. Também sei identificar e desenhar formas geométricas básicas, como triângulos, quadrados e círculos."
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            RejectButton()
-                            LikeButton()
-                        }
-
-//                    Spacer(modifier = Modifier.height(80.dp))
                     }
+                    Spacer(modifier = Modifier.height(120.dp))
                 }
             }
+        }
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+            .zIndex(11f),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RejectButton()
+                LikeButton()
+            }
+            Spacer(modifier = Modifier.height(70.dp))
         }
     }
 }
@@ -275,13 +318,13 @@ fun LikeButton() {
     Button(
         onClick = { /* ação do botão */ },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
+            containerColor = Color.Transparent
         )
     ) {
         Image(
             painter = painterResource(id = R.drawable.button_like_icon),
             contentDescription = "Button Icon",
-            modifier = Modifier.size(70.dp)
+            modifier = Modifier.size(56.dp)
         )
     }
 }
@@ -291,20 +334,24 @@ fun RejectButton() {
     Button(
         onClick = { /* ação do botão */ },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
+            containerColor = Color.Transparent
         )
     ) {
         Image(
             painter = painterResource(id = R.drawable.button_reject_icon),
             contentDescription = "Button Icon",
-            modifier = Modifier.size(70.dp)
+            modifier = Modifier.size(56.dp)
         )
     }
 }
+
 @Composable
-fun LogOutButton() {
+fun LogOutButton(
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
+) {
     Button(
-        onClick = { /* ação do botão */ },
+        onClick = { logoutUser(navController = navController, sharedViewModel = sharedViewModel) },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White
         )
@@ -312,7 +359,49 @@ fun LogOutButton() {
         Image(
             painter = painterResource(id = R.drawable.log_out_button_icon),
             contentDescription = "Button Icon",
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(32.dp)
+        )
+    }
+}
+
+@Composable
+fun UserMatchText(
+    experienceorknow: String,
+    level: String,
+    describe: String,
+    subject: String
+) {
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    )
+    {
+        Text(
+            "${subject}:",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Start
+        )
+
+        Row() {
+            Text(
+                "Nível de ${experienceorknow}:",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Start
+            )
+            Text(
+                " ${level}",
+                fontSize = 18.sp
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+        }
+        Text(
+            "${describe}",
+            fontSize = 16.sp
         )
     }
 }

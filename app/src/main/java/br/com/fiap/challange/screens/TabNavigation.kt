@@ -1,5 +1,6 @@
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.Manifest
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -39,7 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import br.com.fiap.challange.R
-import br.com.fiap.challange.manager.UserManager
+import br.com.fiap.challange.database.repository.NotificationRepository
 import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.White
@@ -53,19 +54,22 @@ import kotlinx.coroutines.delay
 @Composable
 fun TabNavigationScreen(
     navController: NavHostController,
-    sendNotification: (role: String, person: String, subject: String, message: String) -> Unit
+    sendNotification: (title: String, text: String) -> Unit,
+    sharedViewModel: SharedViewModel = viewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    var userManager: UserManager = UserManager(LocalContext.current)
-
+    val loggedUser = sharedViewModel.user
+    val context = LocalContext.current
+    val notificationRepository = NotificationRepository(context)
 
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search", "profile", "match")) {
-                val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+            if (currentRoute in listOf("search", "profile/{profileId}", "match")) {
+                val permissionState =
+                    rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
                 LaunchedEffect(Unit) {
                     permissionState.launchPermissionRequest()
@@ -74,9 +78,20 @@ fun TabNavigationScreen(
                 LaunchedEffect(Unit) {
                     while (true) {
                         delay(5000)
-                        val role = "mentor"
-                        val notificationTexts = generateNotificationMessage(role)
-                        sendNotification(role, "Matheus", "programação", notificationTexts)
+                        val lastNotification =
+                            notificationRepository.getLastNewNotificationsFromUserId(loggedUser!!.user.id)
+
+                        if (lastNotification !== null) {
+                            val role = lastNotification.requestType
+                            val userWantTo = if (role == "mentor") "aprender" else "ensinar"
+
+                            sendNotification(
+                                lastNotification.message,
+                                "${lastNotification.fromUserName} gostaria de ${userWantTo} ${lastNotification.commomSubject} com você."
+                            )
+
+                            notificationRepository.markNotificationAsReceived(lastNotification.id)
+                        }
                     }
                 }
                 TabRow(
@@ -161,23 +176,42 @@ fun TabNavigationScreen(
         }
     ) {
         NavHost(navController, startDestination = "login") {
-            composable("login") { LoginScreen(navController = navController, userManager) }
+
+            composable("login") {
+                LoginScreen(
+                    navController = navController,
+                    sharedViewModel = sharedViewModel
+                )
+            }
             composable("register") { RegisterScreen(navController = navController) }
             composable("search") { SearchScreen(navController = navController) }
             composable("interestRegister/{userId}") { backStackEntry ->
                 InterestRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId")
+                    userId = backStackEntry.arguments?.getString("userId"),
+                    user = loggedUser
                 )
             }
             composable("experienceRegister/{userId}") { backStackEntry ->
                 ExperienceRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId")
+                    userId = backStackEntry.arguments?.getString("userId"),
+                    user = loggedUser
                 )
             }
-            composable("profile") { ProfileScreen(navController = navController) }
-            composable("match") { MatchScreen(navController = navController, userManager = userManager)}
+            composable("profile/{profileId}") { backStackEntry ->
+                ProfileScreen(
+                    navController = navController,
+                    userId = backStackEntry.arguments?.getString("profileId")
+                )
+            }
+            composable("match") {
+                MatchScreen(
+                    navController = navController,
+                    user = loggedUser,
+                    sharedViewModel = sharedViewModel
+                )
+            }
         }
     }
 }
