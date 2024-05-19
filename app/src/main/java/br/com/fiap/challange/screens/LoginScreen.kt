@@ -94,6 +94,7 @@ fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) 
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
+
                     Text(
                         "Seja bem-vindo!",
                         fontSize = 28.sp,

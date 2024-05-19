@@ -81,7 +81,7 @@ fun TabNavigationScreen(
                         val lastNotification =
                             notificationRepository.getLastNewNotificationsFromUserId(loggedUser!!.user.id)
 
-                        if(lastNotification !== null){
+                        if (lastNotification !== null) {
                             val role = lastNotification.requestType
                             val userWantTo = if (role == "mentor") "aprender" else "ensinar"
 
@@ -189,13 +189,15 @@ fun TabNavigationScreen(
             composable("interestRegister/{userId}") { backStackEntry ->
                 InterestRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId")
+                    userId = backStackEntry.arguments?.getString("userId"),
+                    user = loggedUser
                 )
             }
             composable("experienceRegister/{userId}") { backStackEntry ->
                 ExperienceRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId")
+                    userId = backStackEntry.arguments?.getString("userId"),
+                    user = loggedUser
                 )
             }
             composable("profile/{profileId}") { backStackEntry ->
