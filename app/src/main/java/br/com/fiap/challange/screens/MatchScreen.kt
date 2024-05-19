@@ -71,8 +71,6 @@ import androidx.lifecycle.asLiveData
 fun MatchScreen(navController: NavHostController, userManager: UserManager) {
     val snackbarHostState = remember { SnackbarHostState() }
     var isClicked by remember { mutableStateOf(false) }
-    var boxColor = Black
-    var textColor = Black
     var isMentor = 0
     var isStudent = 0
 
@@ -153,7 +151,7 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
                                     Text(text = "Alunos", color = Color.White, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                                 }
                             }
-
+                            // COMENTÁRIO ABAIXO É O SELECT QUANDO O PERFIL É ALUNO E MENTOR
 //                            Box(
 //                                contentAlignment = Alignment.Center,
 //                                modifier = Modifier
@@ -219,6 +217,7 @@ fun MatchScreen(navController: NavHostController, userManager: UserManager) {
 //                            }
 
                         }
+                        // LINHA ABAIXO DE EXEMPLO USANDO O USER MANAGER
                         Text(text = if(isMentor == 1) "Sou um mentor" else "sou um estudante")
                         Text(
                             text = "Mateus Santos",
