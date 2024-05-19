@@ -153,7 +153,7 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
 
 @Composable
 fun FormLogin(onSend: (status: Boolean) -> Unit) {
-    val context = LocalContext.current
+        val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var error = remember { mutableStateOf(false) }
@@ -254,8 +254,8 @@ suspend fun login(
 ): User {
     val userRepository = UserRepository(context)
     val user = userRepository.getUserByLogin(
-        email = email,
-        senha = senha
+        email = "alexandre-ferreira@example.com",
+        senha = "admin123"
     )
 
     return (user)

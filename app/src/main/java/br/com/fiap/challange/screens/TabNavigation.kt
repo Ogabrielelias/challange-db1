@@ -50,7 +50,7 @@ fun TabNavigationScreen(navController: NavHostController) {
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search", "profile")) {
+            if (currentRoute in listOf("search", "profile", "match")) {
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = White,
@@ -90,28 +90,27 @@ fun TabNavigationScreen(navController: NavHostController) {
                         },
                     )
                     Tab(
-                        selected = currentRoute == "tab2",
-                        onClick = { navController.navigate("tab2"); currentTab = 1 },
+                        selected = currentRoute == "match",
+                        onClick = { navController.navigate("match"); currentTab = 0 },
                         text = {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
-                                    .clip(shape = RoundedCornerShape(48.dp))
-                                    .background(if (currentRoute == "tab2") MainBlue else White)
-                                    .size(40.dp),
-
-                                ) {
+                                    .clip(shape = RoundedCornerShape(40.dp))
+                                    .background(if (currentRoute == "match") MainBlue else White)
+                                    .size(48.dp),
+                            ) {
                                 Image(
-                                    painter = painterResource(if (currentRoute == "tab2") R.drawable.compasswhite else R.drawable.compass),
-                                    contentDescription = "compass",
+                                    painter = painterResource(if (currentRoute == "match") R.drawable.compasswhite else R.drawable.compass),
+                                    contentDescription = "match",
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
-                        }
+                        },
                     )
                     Tab(
                         selected = currentRoute == "tab3",
-                        onClick = { navController.navigate("tab3"); currentTab = 1 },
+                        onClick = { navController.navigate("tab3"); currentTab = 2 },
                         text = {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -140,8 +139,7 @@ fun TabNavigationScreen(navController: NavHostController) {
             composable("interests") { DescribeInterestsScreen(navController = navController) }
             composable("experiences") { DescribeExperienceScreen(navController = navController) }
             composable("profile") { ProfileScreen(navController = navController) }
-
-
+            composable("match") { MatchScreen(navController = navController) }
         }
     }
 }
