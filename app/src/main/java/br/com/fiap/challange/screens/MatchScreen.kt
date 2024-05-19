@@ -68,7 +68,12 @@ import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.Purple100
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
+import br.com.fiap.challange.constants.ExperiencesLevelList
+import br.com.fiap.challange.constants.InterestsLevelList
+import br.com.fiap.challange.database.repository.UserRepository
+import br.com.fiap.challange.model.MatchUserStudent
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.utils.logoutUser
 
@@ -80,16 +85,83 @@ fun MatchScreen(
     user: UserWithExperiencesAndInterests?,
     sharedViewModel: SharedViewModel
 ) {
+    val context = LocalContext.current
+    val userRepository = UserRepository(context)
     val snackbarHostState = remember { SnackbarHostState() }
-    var selected by remember { mutableStateOf("Mentores") }
+    var selected by remember { mutableStateOf("Alunos") }
     var userValue by remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
+    var matchQueue = remember { mutableStateListOf<MatchUserStudent>() }
 
     LaunchedEffect(user) {
         if (user != null) {
             userValue = user
-            selected = if (user.user.isMentor == 1) "Alunos" else "Mentores"
+            if (user.user.isStudent == 1) {
+                selected = "Mentores"
+            }
         } else {
             navController.navigate("login")
+        }
+    }
+
+    LaunchedEffect(selected) {
+
+        if (selected == "Alunos") {
+            val usersToMatch = userRepository.getStudentsToMatchFromExperiences(
+                userValue?.experiences!!.map { it.experience },
+                userValue?.user!!.id
+            )
+
+            matchQueue.clear()
+
+            usersToMatch.forEach { user ->
+                userValue?.experiences
+                    ?.map { it.experience }
+                    ?.intersect(user.interests.map {
+                        it.interest
+                    }.toSet())?.forEach { subject ->
+                        val userInterest = user.interests.find { it.interest == subject }
+
+                        matchQueue.add(
+                            MatchUserStudent(
+                                id = user.user.id,
+                                name = user.user.name,
+                                subject = subject,
+                                level = userInterest!!.level,
+                                description = userInterest.description,
+                                othersList = user.interests.map{it.interest}.filter{it != subject}
+                            )
+                        )
+                    }
+            }
+        } else if (selected == "Mentores") {
+            val usersToMatch = userRepository.getMentorToMatchFromInterests(
+                userValue?.interests!!.map { it.interest },
+                userValue?.user!!.id
+            )
+
+            matchQueue.clear()
+
+            usersToMatch.forEach { user ->
+                println(user)
+                userValue?.interests
+                    ?.map { it.interest }
+                    ?.intersect(user.experiences.map {
+                        it.experience
+                    }.toSet())?.forEach { subject ->
+                        val userInterest = user.experiences.find { it.experience == subject }
+
+                        matchQueue.add(
+                            MatchUserStudent(
+                                id = user.user.id,
+                                name = user.user.name,
+                                subject = subject,
+                                level = userInterest!!.level,
+                                description = userInterest.description,
+                                othersList = user.experiences.map{it.experience}.filter{it != subject}
+                            )
+                        )
+                    }
+            }
         }
     }
 
@@ -98,7 +170,7 @@ fun MatchScreen(
             .fillMaxSize()
             .background(Color.Transparent)
             .zIndex(10f)
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         LogOutButton(
             navController = navController,
@@ -256,34 +328,106 @@ fun MatchScreen(
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        Text(
-                            text = "Mateus Santos",
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier
-                                .drawBehind {
-                                    drawLine(
-                                        color = LightBlue,
-                                        start = Offset(0f, size.height),
-                                        end = Offset(size.width, size.height),
-                                        strokeWidth = 2.dp.toPx(),
-                                        cap = StrokeCap.Round
-                                    )
+                    if (matchQueue.isNotEmpty()) {
+                        if (selected == "Alunos") {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                Text(
+                                    text = matchQueue[0].name,
+                                    fontSize = 40.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    textAlign = TextAlign.Start,
+                                    modifier = Modifier
+                                        .drawBehind {
+                                            drawLine(
+                                                color = LightBlue,
+                                                start = Offset(0f, size.height),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = 2.dp.toPx(),
+                                                cap = StrokeCap.Round
+                                            )
+                                        }
+                                )
+                                UserMatchText(
+                                    subject = matchQueue[0].subject,
+                                    experienceorknow = "conhecimento",
+                                    level = InterestsLevelList[matchQueue[0].level - 1],
+                                    describe = matchQueue[0].description
+                                )
+                                if(matchQueue[0].othersList.isNotEmpty()){
+                                    Row {
+                                        Text(
+                                            text = "Outros conhecimentos:",
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            fontWeight = FontWeight.ExtraBold,
+                                        )
+                                        Text(
+                                            text = matchQueue[0].othersList.joinToString(separator = ", "),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            fontWeight = FontWeight.Normal,
+                                        )
+                                    }
                                 }
-                        )
-                        UserMatchText(
-                            subject = "Matemática",
-                            experienceorknow = "experiência",
-                            level = "Graduado",
-                            describe = "Ao longo da minha jornada como mentor graduado em matemática, tive a oportunidade de guiar alunos desde os conceitos mais básicos até os desafios mais avançados, testemunhando suas jornadas de crescimento e superação. Cada experiência foi única e gratificante, reforçando minha convicção no poder da educação e no impacto transformador que um mentor pode ter na vida de seus alunos."
-                        )
+                            }
+                        } else if (selected == "Mentores") {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                Text(
+                                    text = matchQueue[0].name,
+                                    fontSize = 40.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Start,
+                                    modifier = Modifier
+                                        .drawBehind {
+                                            drawLine(
+                                                color = LightBlue,
+                                                start = Offset(0f, size.height),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = 2.dp.toPx(),
+                                                cap = StrokeCap.Round
+                                            )
+                                        }
+                                )
+                                UserMatchText(
+                                    subject = matchQueue[0].subject,
+                                    experienceorknow = "experiência",
+                                    level = ExperiencesLevelList[matchQueue[0].level - 1],
+                                    describe = matchQueue[0].description
+                                )
+
+                                if(matchQueue[0].othersList.isNotEmpty()){
+                                    Row {
+                                        Text(
+                                            text = "Outras experiências:",
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            fontWeight = FontWeight.ExtraBold,
+                                        )
+                                        Text(
+                                            text = matchQueue[0].othersList.joinToString(separator = ", "),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            fontWeight = FontWeight.Normal,
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
-                    Spacer(modifier = Modifier.height(120.dp))
                 }
+                Spacer(modifier = Modifier.height(120.dp))
             }
         }
     }
@@ -378,7 +522,7 @@ fun UserMatchText(
     {
         Text(
             "${subject}:",
-            fontSize = 20.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Start
         )

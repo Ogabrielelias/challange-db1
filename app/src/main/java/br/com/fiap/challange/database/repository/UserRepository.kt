@@ -59,4 +59,15 @@ class UserRepository(context: Context) {
         }
     }
 
+    suspend fun getStudentsToMatchFromExperiences(experienceList: List<String>, mentorId:Long): List<UserWithExperiencesAndInterests> {
+        return withContext(Dispatchers.IO) {
+            db.getStudentsToMatchFromExperiences(experienceList, mentorId)
+        }
+    }
+
+    suspend fun getMentorToMatchFromInterests(interestsList: List<String>, mentorId:Long): List<UserWithExperiencesAndInterests> {
+        return withContext(Dispatchers.IO) {
+            db.getMentorToMatchFromInterests(interestsList, mentorId)
+        }
+    }
 }

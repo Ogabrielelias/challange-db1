@@ -31,3 +31,12 @@ val experiences: List<Experience> = emptyList(),
 )
 val interests: List<Interest> = emptyList()
 )
+
+data class MatchUserStudent(
+    val id: Long = 0,
+    val name: String = "",
+    val subject: String = "",
+    val level: Int,
+    val description: String,
+    val othersList: List<String>
+)
