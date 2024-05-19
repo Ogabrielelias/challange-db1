@@ -1,5 +1,6 @@
 package br.com.fiap.challange.screens
 
+import android.Manifest
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,10 +41,12 @@ import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.White
 import br.com.fiap.challange.utils.generateNotificationMessage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun TabNavigationScreen(
     navController: NavHostController,
@@ -57,10 +60,15 @@ fun TabNavigationScreen(
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
             if (currentRoute in listOf("search", "profile")) {
+                val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
+                LaunchedEffect(Unit) {
+                    permissionState.launchPermissionRequest()
+                }
 
                 LaunchedEffect(Unit) {
                     while (true) {
-                        delay(60000)
+                        delay(5000)
                         val role = "mentor"
                         val notificationTexts = generateNotificationMessage(role)
                         sendNotification(role, "Matheus", "programação", notificationTexts)
