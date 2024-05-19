@@ -50,7 +50,7 @@ fun TabNavigationScreen(navController: NavHostController) {
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search")) {
+            if (currentRoute in listOf("search", "profile")) {
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = White,
@@ -149,6 +149,7 @@ fun TabNavigationScreen(navController: NavHostController) {
                     userId = backStackEntry.arguments?.getString("userId")
                 )
             }
+            composable("profile") { ProfileScreen(navController = navController) }
         }
     }
 }
