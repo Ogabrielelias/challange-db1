@@ -59,7 +59,7 @@ fun TabNavigationScreen(
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search", "profile")) {
+            if (currentRoute in listOf("search", "profile/{profileId}")) {
                 val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
                 LaunchedEffect(Unit) {
@@ -173,7 +173,12 @@ fun TabNavigationScreen(
                     userId = backStackEntry.arguments?.getString("userId")
                 )
             }
-            composable("profile") { ProfileScreen(navController = navController) }
+            composable("profile/{profileId}") { backStackEntry ->
+                ProfileScreen(
+                    navController = navController,
+                    userId = backStackEntry.arguments?.getString("profileId")
+                )
+            }
         }
     }
 }

@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
-    
+
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -184,7 +184,8 @@ fun SearchScreen(navController: NavController) {
                         UserSearchCard(
                             name = user.user.name,
                             experiences = user.experiences.map { exp -> exp.experience },
-                            interests = user.interests.map { int -> int.interest }
+                            interests = user.interests.map { int -> int.interest },
+                            onNavigate = {navController.navigate("profile/${user.user.id}")}
                         )
                     }
                     Spacer(modifier = Modifier.height(80.dp))
@@ -198,7 +199,8 @@ fun SearchScreen(navController: NavController) {
 fun UserSearchCard(
     name: String,
     experiences: List<String>? = null,
-    interests: List<String>? = null
+    interests: List<String>? = null,
+    onNavigate:()->Unit
 ) {
     Column(Modifier.drawBehind {
         drawLine(
@@ -208,6 +210,10 @@ fun UserSearchCard(
             strokeWidth = 2.dp.toPx(),
             cap = StrokeCap.Round
         )
+    }.pointerInput(Unit) {
+        detectTapGestures {
+            onNavigate()
+        }
     }) {
         Column(
             modifier = Modifier
@@ -396,7 +402,7 @@ fun search(
     isStudent: Int? = null,
     formationLevel: Int? = null,
     experienceLevel: Int? = null,
-    scope:CoroutineScope
+    scope: CoroutineScope
 ) {
     val userRepository = UserRepository(context)
     scope.launch(Dispatchers.Main) {
