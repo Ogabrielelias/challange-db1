@@ -19,3 +19,11 @@ val interesstsList = listOf(
     "Filosofia",
     "Culinária"
 )
+
+val emojisList = listOf(
+    "\uD83D\uDE80", //Foguete
+    "\uD83D\uDCA1", //Lâmpada
+    "\uD83C\uDF89", //Confetes
+    "\uD83C\uDF93", //Capelo
+    "\uD83C\uDF88"  //Balão
+    )

@@ -29,6 +29,7 @@ data class Notification(
     val requestType: String, //"mentor" ou "aluno"
     val commomSubject: String, // Matéria em comum
     val fromUserId: Long,
+    val frontIcon: String?,
     val message: String
 )
 
@@ -40,6 +41,7 @@ data class NotificationWithUserNames(
     val fromUserId: Long,
     val requestType: String, //"mentor" ou "aluno"
     val commomSubject: String,
+    val frontIcon: String?,
     val message: String,
     val fromUserName: String,
     val toUserName: String
