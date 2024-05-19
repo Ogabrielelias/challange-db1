@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun sendNotification(role: String, person: String, subject: String, notificationText:String) {
+    private fun sendNotification(notificationTitle: String, notificationText:String) {
 
 
 
@@ -59,12 +59,11 @@ class MainActivity : ComponentActivity() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        var roleText = if (role == "mentor") "ensinar" else "aprender"
 
         val builder = NotificationCompat.Builder(this, CHANNELID)
             .setSmallIcon(R.drawable.compasswhite)
-            .setContentTitle(notificationText)
-            .setContentText("${person} gostaria de ${roleText} ${subject} a você.")
+            .setContentTitle(notificationTitle)
+            .setContentText(notificationText)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
 
@@ -87,12 +86,10 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     TabNavigationScreen(
                         navController,
-                        sendNotification = { role, person, subject, message ->
+                        sendNotification = { title, text ->
                             sendNotification(
-                                role,
-                                person,
-                                subject,
-                                message
+                                notificationText = text,
+                                notificationTitle = title
                             )
                         });
                 }

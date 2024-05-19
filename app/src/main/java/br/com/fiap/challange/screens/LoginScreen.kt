@@ -1,5 +1,6 @@
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.TextUtils
@@ -55,7 +56,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, sharedViewModel: SharedViewModel) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -110,6 +111,7 @@ fun LoginScreen(navController: NavController) {
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
+                        sharedViewModel.user = user
                         if (user!!.interests.isEmpty() && user.user.isStudent == 1) {
                             navController.navigate("interestRegister/${user.user.id}")
                         } else if (user.experiences.isEmpty() && user.user.isMentor == 1) {
