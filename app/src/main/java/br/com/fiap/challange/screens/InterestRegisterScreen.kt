@@ -26,10 +26,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import br.com.fiap.challange.constants.InterestsLevelList
+import br.com.fiap.challange.database.repository.ExperienceRepository
 import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.database.repository.UserRepository
 import br.com.fiap.challange.model.Interest
 import br.com.fiap.challange.model.User
+import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -42,19 +44,23 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val userRepository = remember { UserRepository(context) }
     val interestRepository = remember { InterestRepository(context) }
 
-    var step = remember { mutableStateOf<Int>(1) }
-    var hasInterest = remember { mutableStateOf<Boolean>(false) }
-    var selectedInterests = remember { mutableStateListOf<String>() }
+    val step = remember { mutableStateOf<Int>(1) }
+    val hasInterest = remember { mutableStateOf<Boolean>(false) }
+    val selectedInterests = remember { mutableStateListOf<String>() }
     val snackbarHostState = remember { SnackbarHostState() }
-    var isLoading = remember { mutableStateOf<Boolean>(true) }
+    val isLoading = remember { mutableStateOf<Boolean>(true) }
+    val userValue = remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
 
     LaunchedEffect(userId) {
         userId?.let {
-            val interests = interestRepository.getInterestByUserId(it.toLong())
-            hasInterest.value = interests.isNotEmpty()
-            isLoading.value = false
+            val user = userRepository.getUserById(it.toLong())
+            hasInterest.value = user.interests.isNotEmpty()
+
+            if (user.interests.isEmpty()) isLoading.value = false
+            userValue.value = user
         }
     }
 
@@ -71,7 +77,8 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
             ) {
                 CircularProgressIndicator()
             }
-        } else if (userId !== null) {
+        }
+        if (userId !== null) {
             if (!hasInterest.value) {
                 when (step.value) {
                     1 -> SelectInterestsScreen(onNext = { interests ->
@@ -92,7 +99,6 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
                     2 -> DescribeInterestsScreen(
                         userInterests = selectedInterests,
                         onNext = { interests, levels ->
-
                             scope.launch {
                                 if (interests.values.all { it.isNotEmpty() } &&
                                     levels.values.all { it.isNotEmpty() }) {
@@ -113,7 +119,15 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
 
                                         saveJobs.awaitAll()
 
-                                        navController.navigate("experienceRegister/${userId}")
+                                        if (userValue.value != null) {
+                                            val userExperiences = userValue.value!!.experiences
+
+                                            if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
+                                                navController.navigate("experienceRegister/${userId}")
+                                            } else {
+                                                navController.navigate("search")
+                                            }
+                                        }
                                     } catch (err: Throwable) {
                                         isLoading.value = false
                                         scope.launch {
@@ -136,9 +150,19 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?) {
                     )
                 }
             } else {
-                navController.navigate("experienceRegister/${userId}")
+                scope.launch {
+                    if (userValue.value != null) {
+                        val userExperiences = userValue.value!!.experiences
+
+                        if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
+                            navController.navigate("experienceRegister/${userId}")
+                        } else {
+                            navController.navigate("search")
+                        }
+                    }
+                }
             }
-        }else{
+        } else {
             navController.navigate("login")
         }
     }

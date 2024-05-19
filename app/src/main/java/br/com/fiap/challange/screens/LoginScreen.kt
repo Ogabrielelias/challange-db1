@@ -105,12 +105,18 @@ fun LoginScreen(navController: NavController) {
                     )
 
                 }
-                FormLogin(onSend = { status, userId ->
+                FormLogin(onSend = { status, user ->
                     var message = "Login efetuado!"
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
-                        navController.navigate("interestRegister/${userId}")
+                        if (user!!.interests.isEmpty() && user.user.isStudent == 1) {
+                            navController.navigate("interestRegister/${user.user.id}")
+                        } else if (user.experiences.isEmpty() && user.user.isMentor == 1) {
+                            navController.navigate("experienceRegister/${user.user.id}")
+                        } else {
+                            navController.navigate("search")
+                        }
                     }
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -152,19 +158,19 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
 }
 
 @Composable
-fun FormLogin(onSend: (status: Boolean, userId: Long?) -> Unit) {
+fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var error = remember { mutableStateOf(false) }
+    val error = remember { mutableStateOf(false) }
 
     val buttonDisabled = remember { mutableStateOf(true) }
 
-    var emailValue = remember {
+    val emailValue = remember {
         mutableStateOf("")
     }
 
-    var senhaValue = remember {
+    val senhaValue = remember {
         mutableStateOf("")
     }
 
@@ -210,7 +216,7 @@ fun FormLogin(onSend: (status: Boolean, userId: Long?) -> Unit) {
             onClick = { ->
                 try {
                     scope.launch {
-                        val user: User = login(
+                        val user: UserWithExperiencesAndInterests = login(
                             context = context,
                             email = emailValue.value,
                             senha = senhaValue.value
@@ -223,7 +229,7 @@ fun FormLogin(onSend: (status: Boolean, userId: Long?) -> Unit) {
                             senhaValue.value = ""
                         }
 
-                        onSend(user != null, user?.id?:null)
+                        onSend(user != null, user)
                     }
                 } catch (err: Throwable) {
                     println(err)
@@ -251,7 +257,7 @@ suspend fun login(
     context: Context,
     email: String,
     senha: String
-): User {
+): UserWithExperiencesAndInterests {
     val userRepository = UserRepository(context)
     val user = userRepository.getUserByLogin(
         email = email,

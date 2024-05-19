@@ -20,11 +20,23 @@ interface UserDAO {
     @Delete
     fun delete(user: User): Int
 
-    @Query("SELECT * FROM tb_user WHERE id = :id")
-    fun getUserById(id: Long): User
+    @Query("""
+        SELECT u.*, e.experience AS user_experience, i.interest AS user_interest 
+        FROM tb_user u
+        LEFT JOIN tb_experience e ON u.id = e.userId
+        LEFT JOIN tb_interest i ON u.id = i.userId
+        WHERE u.id = :id
+        """)
+    fun getUserById(id: Long): UserWithExperiencesAndInterests
 
-    @Query("SELECT * FROM tb_user WHERE email = :email and password = :senha")
-    fun getUserByLogin(email: String, senha: String): User
+    @Query("""
+        SELECT u.*, e.experience AS user_experience, i.interest AS user_interest 
+        FROM tb_user u
+        LEFT JOIN tb_experience e ON u.id = e.userId
+        LEFT JOIN tb_interest i ON u.id = i.userId
+        WHERE email = :email and password = :senha
+    """)
+    fun getUserByLogin(email: String, senha: String): UserWithExperiencesAndInterests
 
     @Query("SELECT * FROM tb_user WHERE email = :email ")
     fun getUserByEmail(email: String): User

@@ -59,7 +59,7 @@ fun DescribeExperienceScreen(
     LaunchedEffect(userExperiences) {
         userExperiences.forEach { experience ->
             experiencesValue[experience] = ""
-            experiencesLevelValue[experience] = ""
+            experiencesLevelValue[experience] = "Autônomo"
         }
     }
 

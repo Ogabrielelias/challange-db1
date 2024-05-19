@@ -62,6 +62,7 @@ import br.com.fiap.challange.ui.theme.Black
 import br.com.fiap.challange.ui.theme.Gray
 import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.White
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -70,6 +71,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavController) {
+    
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -108,7 +110,8 @@ fun SearchScreen(navController: NavController) {
                     isMentor = isMentor,
                     isStudent = isStudent,
                     formationLevel = expValue,
-                    experienceLevel = intValue
+                    experienceLevel = intValue,
+                    scope = scope
                 )
             }
         )
@@ -155,7 +158,8 @@ fun SearchScreen(navController: NavController) {
                                 isMentor = isMentor,
                                 isStudent = isStudent,
                                 formationLevel = experienceFilter.value,
-                                experienceLevel = interestFilter.value
+                                experienceLevel = interestFilter.value,
+                                scope = scope
                             )
                         })
                     )
@@ -386,10 +390,11 @@ fun search(
     isMentor: Int? = null,
     isStudent: Int? = null,
     formationLevel: Int? = null,
-    experienceLevel: Int? = null
+    experienceLevel: Int? = null,
+    scope:CoroutineScope
 ) {
     val userRepository = UserRepository(context)
-    GlobalScope.launch(Dispatchers.Main) {
+    scope.launch(Dispatchers.Main) {
         val searchedUsers = userRepository.searchUsers(
             searchTerm,
             isMentor,

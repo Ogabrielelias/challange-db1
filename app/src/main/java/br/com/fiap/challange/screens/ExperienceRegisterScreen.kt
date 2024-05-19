@@ -38,20 +38,19 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) 
     val scope = rememberCoroutineScope()
     val experienceRepository = remember { ExperienceRepository(context) }
 
-    var step = remember { mutableStateOf<Int>(1) }
-    var hasExperiences = remember { mutableStateOf<Boolean>(false) }
-    var selectedExperiences = remember { mutableStateListOf<String>() }
+    val step = remember { mutableStateOf(1) }
+    val hasExperiences = remember { mutableStateOf(false) }
+    val selectedExperiences = remember { mutableStateListOf<String>() }
     val snackbarHostState = remember { SnackbarHostState() }
-    var isLoading = remember { mutableStateOf<Boolean>(true) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(userId) {
         userId?.let {
-            val interests = experienceRepository.getExperiencesByUserId(it.toLong())
-            hasExperiences.value = interests.isNotEmpty()
-            isLoading.value = false
+            val experiences = experienceRepository.getExperiencesByUserId(it.toLong())
+            hasExperiences.value = experiences.isNotEmpty()
+            if(experiences.isEmpty()) isLoading.value = false
         }
     }
-
     Scaffold(
         containerColor = Color.Transparent,
         snackbarHost = {
@@ -65,7 +64,8 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?) 
             ) {
                 CircularProgressIndicator()
             }
-        } else if (userId !== null) {
+        }
+        if (userId !== null) {
             if (!hasExperiences.value) {
                 when (step.value) {
                     1 -> SelectExperiencesScreen(onNext = { experiences ->

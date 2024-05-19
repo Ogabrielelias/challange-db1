@@ -49,7 +49,7 @@ fun DescribeInterestsScreen(
     LaunchedEffect(userInterests) {
         userInterests.forEach { interest ->
             interestsValue[interest] = ""
-            interestsLevelValue[interest] = ""
+            interestsLevelValue[interest] = "Nenhum"
         }
     }
 

@@ -29,7 +29,7 @@ class UserRepository(context: Context) {
         return db.listUser()
     }
 
-    suspend fun getUserById(id: Long): User {
+    suspend fun getUserById(id: Long): UserWithExperiencesAndInterests {
         return withContext(Dispatchers.IO) {
             db.getUserById(id)
         }
@@ -47,7 +47,7 @@ class UserRepository(context: Context) {
         }
     }
 
-    suspend fun getUserByLogin(email: String, senha: String): User {
+    suspend fun getUserByLogin(email: String, senha: String): UserWithExperiencesAndInterests {
         return withContext(Dispatchers.IO) {
             db.getUserByLogin(email, senha)
         }
