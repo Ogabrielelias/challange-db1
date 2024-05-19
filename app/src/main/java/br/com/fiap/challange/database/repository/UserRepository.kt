@@ -11,8 +11,10 @@ class UserRepository(context: Context) {
 
     private val db = AppDatabase.getDatabase(context).userDao()
 
-    fun save(user: User): Long {
-        return db.save(user)
+    suspend fun save(user: User): Long {
+        return withContext(Dispatchers.IO) {
+            db.save(user)
+        }
     }
 
     fun update(user: User): Int {
@@ -27,8 +29,10 @@ class UserRepository(context: Context) {
         return db.listUser()
     }
 
-    fun getUserById(id: Int): User {
-        return db.getUserById(id)
+    suspend fun getUserById(id: Long): User {
+        return withContext(Dispatchers.IO) {
+            db.getUserById(id)
+        }
     }
 
     suspend fun searchUsers(
@@ -39,18 +43,20 @@ class UserRepository(context: Context) {
         experienceLevel: Int? = null
     ): List<UserWithExperiencesAndInterests> {
         return withContext(Dispatchers.IO) {
-            db.searchUsers(searchTerm,isMentor,isStudent,formationLevel,experienceLevel)
+            db.searchUsers(searchTerm, isMentor, isStudent, formationLevel, experienceLevel)
         }
     }
 
-    suspend fun getUserByLogin(email:String, senha:String): User {
+    suspend fun getUserByLogin(email: String, senha: String): User {
         return withContext(Dispatchers.IO) {
             db.getUserByLogin(email, senha)
         }
     }
 
-    fun getUserByEmail(email:String): User {
-        return db.getUserByEmail(email)
+    suspend fun getUserByEmail(email: String): User {
+        return withContext(Dispatchers.IO) {
+            db.getUserByEmail(email)
+        }
     }
 
 }

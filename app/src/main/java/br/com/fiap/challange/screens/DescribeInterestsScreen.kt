@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,12 +33,24 @@ import androidx.navigation.NavHostController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.Components.Select
 import br.com.fiap.challange.R
+import br.com.fiap.challange.constants.ExperiencesLevelList
+import br.com.fiap.challange.constants.InterestsLevelList
+import br.com.fiap.challange.constants.interesstsList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DescribeInterestsScreen(navController: NavHostController) {
-    var InterestsValue = remember {
-        mutableStateMapOf<String,String>("Inglês" to "","Química" to "")
+fun DescribeInterestsScreen(
+    userInterests: List<String>,
+    onNext: (inputsValues: Map<String, String>, selectsValues: Map<String, String>) -> Unit
+) {
+    val interestsValue = remember { mutableStateMapOf<String, String>() }
+    val interestsLevelValue = remember { mutableStateMapOf<String, String>() }
+
+    LaunchedEffect(userInterests) {
+        userInterests.forEach { interest ->
+            interestsValue[interest] = ""
+            interestsLevelValue[interest] = ""
+        }
     }
 
     Column(
@@ -66,7 +79,7 @@ fun DescribeInterestsScreen(navController: NavHostController) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
 
-            ) {
+                ) {
 
                 Spacer(modifier = Modifier.height(30.dp))
                 Text(
@@ -74,12 +87,17 @@ fun DescribeInterestsScreen(navController: NavHostController) {
                     fontSize = 14.sp,
                     textAlign = TextAlign.Start
                 )
+                userInterests.forEach { interest ->
+                    DescribeInterests(
+                        interest = interest,
+                        InputValue = interestsValue[interest],
+                        onChange = { value -> interestsValue[interest] = (value) },
+                        onSelectLevel = {value -> interestsLevelValue[interest] = (value)}
+                    )
+                }
 
-                DescribeInterests(interest = "Inglês", InputValue = InterestsValue["Inglês"], onChange = {value -> InterestsValue["Inglês"] = (value) })
-                DescribeInterests(interest = "Química", InputValue = InterestsValue["Química"], onChange = {value -> InterestsValue["Química"] = (value) })
-
-
-                Button(onClick = { /*TODO*/ },
+                Button(
+                    onClick = { onNext(interestsValue, interestsLevelValue) },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(16.dp),
@@ -89,7 +107,7 @@ fun DescribeInterestsScreen(navController: NavHostController) {
                         disabledContentColor = Color(0xFFC9C9C9)
                     )
                 ) {
-                        Text(text = "Avançar")
+                    Text(text = "Avançar")
                 }
             }
         }
@@ -97,24 +115,33 @@ fun DescribeInterestsScreen(navController: NavHostController) {
 }
 
 @Composable
-fun DescribeInterests(interest: String, InputValue: String?="", onChange: (values: String)-> Unit) {
+fun DescribeInterests(
+    interest: String,
+    InputValue: String? = "",
+    onChange: (values: String) -> Unit,
+    onSelectLevel:(values: String) -> Unit
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
 
         ) {
-        Text(
-            "Qual o seu nível atual de conhecimento em ${interest}?",
-            fontSize = 14.sp,
-            textAlign = TextAlign.Start
-        )
-
-        Select(
-            items = listOf("Nenhum", "Básico", "Intermediário", "Avançado", "Especialista"),
-            onSelect = {})
-
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            Text(
+                "Qual o seu nível atual de conhecimento em ${interest}?",
+                fontSize = 14.sp,
+                textAlign = TextAlign.Start
+            )
+
+            Select(
+                items = InterestsLevelList,
+                onSelect = {
+                    onSelectLevel(it)
+                })
+        }
+
+        Column{
             Text(
                 "${interest}:",
                 fontSize = 14.sp,
@@ -122,7 +149,7 @@ fun DescribeInterests(interest: String, InputValue: String?="", onChange: (value
             )
 
             Input(
-                value = InputValue?:"", onChange = {value -> onChange(value) },
+                value = InputValue ?: "", onChange = { value -> onChange(value) },
                 label = "O que você já sabe deste conteúdo.."
 
             )

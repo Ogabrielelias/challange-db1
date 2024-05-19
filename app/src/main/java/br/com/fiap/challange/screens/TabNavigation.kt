@@ -80,7 +80,7 @@ fun TabNavigationScreen(navController: NavHostController) {
                                     .clip(shape = RoundedCornerShape(40.dp))
                                     .background(if (currentRoute == "search") MainBlue else White)
                                     .size(48.dp),
-                                ) {
+                            ) {
                                 Image(
                                     painter = painterResource(if (currentRoute == "search") R.drawable.searchwhite else R.drawable.search),
                                     contentDescription = "search",
@@ -137,10 +137,18 @@ fun TabNavigationScreen(navController: NavHostController) {
             composable("login") { LoginScreen(navController = navController) }
             composable("register") { RegisterScreen(navController = navController) }
             composable("search") { SearchScreen(navController = navController) }
-            composable("describIinterests") { DescribeInterestsScreen(navController = navController) }
-            composable("describeExperiences") { DescribeExperienceScreen(navController = navController) }
-            composable("selectInterest") { SelectInterestsScreen(navController = navController) }
-            composable("selectExperience") { SelectExperiencesScreen(navController = navController) }
+            composable("interestRegister/{userId}") { backStackEntry ->
+                InterestRegisterScreen(
+                    navController = navController,
+                    userId = backStackEntry.arguments?.getString("userId")
+                )
+            }
+            composable("experienceRegister/{userId}") { backStackEntry ->
+                ExperienceRegisterScreen(
+                    navController = navController,
+                    userId = backStackEntry.arguments?.getString("userId")
+                )
+            }
         }
     }
 }

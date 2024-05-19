@@ -21,7 +21,7 @@ interface UserDAO {
     fun delete(user: User): Int
 
     @Query("SELECT * FROM tb_user WHERE id = :id")
-    fun getUserById(id: Int): User
+    fun getUserById(id: Long): User
 
     @Query("SELECT * FROM tb_user WHERE email = :email and password = :senha")
     fun getUserByLogin(email: String, senha: String): User

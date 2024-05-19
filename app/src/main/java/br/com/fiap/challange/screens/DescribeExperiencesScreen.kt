@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,14 +43,24 @@ import androidx.navigation.NavHostController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.Components.Select
 import br.com.fiap.challange.R
+import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.ui.theme.Gray
 import br.com.fiap.challange.ui.theme.MainBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DescribeExperienceScreen(navController: NavHostController) {
-    var ExperienceValue = remember {
-        mutableStateMapOf<String,String>("Matemática" to "","Ciência da Computação" to "","Física" to "")
+fun DescribeExperienceScreen(
+    userExperiences: List<String>,
+    onNext: (inputsValues: Map<String, String>, selectsValues: Map<String, String>) -> Unit
+) {
+    val experiencesValue = remember { mutableStateMapOf<String, String>() }
+    val experiencesLevelValue = remember { mutableStateMapOf<String, String>() }
+
+    LaunchedEffect(userExperiences) {
+        userExperiences.forEach { experience ->
+            experiencesValue[experience] = ""
+            experiencesLevelValue[experience] = ""
+        }
     }
 
     Column(
@@ -86,13 +97,17 @@ fun DescribeExperienceScreen(navController: NavHostController) {
                     fontSize = 14.sp,
                     textAlign = TextAlign.Start
                 )
+                userExperiences.forEach { experience ->
+                    DescribeExperiences(
+                        experiences = experience,
+                        InputValue = experiencesValue[experience],
+                        onChange = { value -> experiencesValue[experience] = (value) },
+                        onSelectLevel = { value -> experiencesLevelValue[experience] = (value) }
+                    )
+                }
 
-                DescribeExperiences(experiences = "Matemática", InputValue = ExperienceValue["Matemática"], onChange = {value -> ExperienceValue["Matemática"] = (value) })
-                DescribeExperiences(experiences = "Ciência da Computação", InputValue = ExperienceValue["Ciência da Computação"], onChange = {value -> ExperienceValue["Ciência da Computação"] = (value) })
-                DescribeExperiences(experiences = "Física", InputValue = ExperienceValue["Física"], onChange = {value -> ExperienceValue["Física"] = (value) })
-
-
-                Button(onClick = { /*TODO*/ },
+                Button(
+                    onClick = { onNext(experiencesValue, experiencesLevelValue) },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(16.dp),
@@ -110,7 +125,12 @@ fun DescribeExperienceScreen(navController: NavHostController) {
 }
 
 @Composable
-fun DescribeExperiences(experiences: String, InputValue: String?="", onChange: (values: String)-> Unit) {
+fun DescribeExperiences(
+    experiences: String,
+    InputValue: String? = "",
+    onChange: (values: String) -> Unit,
+    onSelectLevel: (values: String) -> Unit
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
 
@@ -122,8 +142,10 @@ fun DescribeExperiences(experiences: String, InputValue: String?="", onChange: (
         )
 
         Select(
-            items = listOf("Autônomo", "Graduado","Pós-Graduado", "Mestrado", "Doutorado"),
-            onSelect = {})
+            items = ExperiencesLevelList,
+            onSelect = {
+                onSelectLevel(it)
+            })
 
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -135,7 +157,7 @@ fun DescribeExperiences(experiences: String, InputValue: String?="", onChange: (
             )
 
             Input(
-                value = InputValue?:"", onChange = {value -> onChange(value) },
+                value = InputValue ?: "", onChange = { value -> onChange(value) },
                 label = "Descreva suas experiências.."
 
             )

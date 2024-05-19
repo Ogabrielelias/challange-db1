@@ -63,15 +63,9 @@ import br.com.fiap.challange.R
 import br.com.fiap.challange.constants.interesstsList
 import br.com.fiap.challange.ui.theme.MainBlue
 
-
-@Composable
-fun SelectInterestsScreen(navController: NavHostController) {
-    InterestsScreen()
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun InterestsScreen() {
+fun SelectInterestsScreen(onNext: (values:List<String>)->Unit) {
 
     var interestsList = remember {
         mutableStateListOf<String>()
@@ -91,7 +85,7 @@ fun InterestsScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onNext(interestsList) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(16.dp),
@@ -140,7 +134,7 @@ fun InterestsScreen() {
         Row {
 
             Text(
-                "Digite quais assuntos você deseja ministrar aulas:",
+                "Quais assuntos deseja aprender?",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -151,7 +145,7 @@ fun InterestsScreen() {
                     interestsList.add(value)
                 }
             },
-            label = "Digite suas experiências",
+            label = "Digite seus interesses",
             writableSelect = true,
             items = interesstsList
         )

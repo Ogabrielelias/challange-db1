@@ -105,12 +105,12 @@ fun LoginScreen(navController: NavController) {
                     )
 
                 }
-                FormLogin(onSend = { status ->
+                FormLogin(onSend = { status, userId ->
                     var message = "Login efetuado!"
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
-                        navController.navigate("search")
+                        navController.navigate("interestRegister/${userId}")
                     }
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -152,7 +152,7 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
 }
 
 @Composable
-fun FormLogin(onSend: (status: Boolean) -> Unit) {
+fun FormLogin(onSend: (status: Boolean, userId: Long?) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -223,7 +223,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                             senhaValue.value = ""
                         }
 
-                        onSend(user != null)
+                        onSend(user != null, user?.id?:null)
                     }
                 } catch (err: Throwable) {
                     println(err)

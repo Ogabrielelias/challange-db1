@@ -21,4 +21,7 @@ interface InterestDAO {
 
     @Query("SELECT * FROM tb_interest WHERE id = :id")
     fun getInterestById(id: Int): Interest
+
+    @Query("SELECT * FROM tb_interest WHERE userId = :id")
+    fun getInterestByUserId(id: Long): List<Interest>
 }
