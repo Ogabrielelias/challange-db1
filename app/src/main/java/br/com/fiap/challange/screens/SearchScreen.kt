@@ -90,8 +90,8 @@ fun SearchScreen(navController: NavController) {
             int = interestFilter.value,
             onClose = { openFilter.value = false },
             onApplyFilter = { role, exp, int ->
-                val expValue = if (exp == 1) null else exp
-                val intValue = if (int == 1) null else int
+                val expValue = if (exp == 0) null else exp
+                val intValue = if (int == 0) null else int
 
                 experienceFilter.value = expValue
                 interestFilter.value = intValue
@@ -142,6 +142,7 @@ fun SearchScreen(navController: NavController) {
                         value = searchValue.value,
                         onChange = { value -> searchValue.value = value },
                         label = "pesquisar",
+                        singleLine = true,
                         frontImage = R.drawable.search,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
@@ -252,8 +253,12 @@ fun FilterModal(
     int: Int? = null
 ) {
     var roleValue = remember { mutableStateOf(role ?: "Ambos") }
-    var experienceValue = remember { mutableStateOf(exp ?: 1) }
-    var interestValue = remember { mutableStateOf(int ?: 1) }
+    var experienceValue = remember { mutableStateOf(exp ?: 0) }
+    var interestValue = remember { mutableStateOf(int ?: 0) }
+
+    var newExpList = (listOf("-") + ExperiencesLevelList)
+    var newIntList = (listOf("-") + InterestsLevelList)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -327,23 +332,23 @@ fun FilterModal(
                             fontSize = 20.sp
                         )
                         Select(
-                            value = ExperiencesLevelList.get(experienceValue.value - 1),
-                            items = ExperiencesLevelList,
+                            value = newExpList[experienceValue.value],
+                            items = newExpList,
                             onSelect = { value ->
-                                experienceValue.value = ExperiencesLevelList.indexOf(value) + 1
+                                experienceValue.value = newExpList.indexOf(value)
                             })
                     }
                     Column {
                         Text(
-                            text = "Nível do interece:",
+                            text = "Nível de conhecimento:",
                             fontWeight = FontWeight.Medium,
                             fontSize = 20.sp
                         )
                         Select(
-                            value = InterestsLevelList.get(experienceValue.value - 1),
-                            items = InterestsLevelList,
+                            value = newIntList[interestValue.value],
+                            items = newIntList,
                             onSelect = { value ->
-                                interestValue.value = InterestsLevelList.indexOf(value) + 1
+                                interestValue.value = newIntList.indexOf(value)
                             })
                     }
                 }

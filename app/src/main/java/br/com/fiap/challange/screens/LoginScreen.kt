@@ -184,7 +184,7 @@ fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) 
                 label = "Email",
                 value = emailValue.value,
                 onChange = { value ->
-                    emailValue.value = value
+                    emailValue.value = value.replace("\n+".toRegex(), replacement = "")
                     buttonDisabled.value = !validateLoginInputs(
                         value,
                         senhaValue.value
@@ -192,6 +192,7 @@ fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) 
                     error.value = false
                 },
                 frontImage = R.drawable.mail,
+                singleLine = true,
                 isError = error.value
             )
 
@@ -199,7 +200,7 @@ fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) 
                 label = "Senha",
                 value = senhaValue.value,
                 onChange = { value ->
-                    senhaValue.value = value
+                    senhaValue.value = value.replace("\n+".toRegex(), replacement = "")
                     buttonDisabled.value = !validateLoginInputs(
                         emailValue.value,
                         value
@@ -207,6 +208,7 @@ fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) 
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 frontImage = R.drawable.lock,
                 isError = error.value
             )

@@ -148,20 +148,22 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Nome",
                 value = nomeValue.value,
                 onChange = { value ->
-                    nomeValue.value = value
+                    nomeValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
-                isError = error.value
+                isError = error.value,
+                singleLine = true,
             )
 
             Input(
                 label = "Idade",
                 value = idadeValue.value,
                 onChange = { value ->
-                    idadeValue.value = value
+                    idadeValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
                 isError = error.value,
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
@@ -178,9 +180,10 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Email",
                 value = emailValue.value,
                 onChange = { value ->
-                    emailValue.value = value
+                    emailValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
+                singleLine = true,
                 isError = error.value
             )
 
@@ -192,6 +195,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 isError = error.value
             )
 
@@ -199,10 +203,11 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Confirmar Senha",
                 value = confirmarSenhaValue.value,
                 onChange = { value ->
-                    confirmarSenhaValue.value = value
+                    confirmarSenhaValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 isError = error.value
             )
 

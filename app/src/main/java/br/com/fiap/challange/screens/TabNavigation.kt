@@ -17,6 +17,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -38,11 +39,16 @@ import br.com.fiap.challange.R
 import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.White
+import br.com.fiap.challange.utils.generateNotificationMessage
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabNavigationScreen(navController: NavHostController) {
+fun TabNavigationScreen(
+    navController: NavHostController,
+    sendNotification: (role: String, person: String, subject: String, message: String) -> Unit
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -51,6 +57,16 @@ fun TabNavigationScreen(navController: NavHostController) {
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
             if (currentRoute in listOf("search", "profile")) {
+
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        delay(60000)
+                        val role = "mentor"
+                        val notificationTexts = generateNotificationMessage(role)
+                        sendNotification(role, "Matheus", "programação", notificationTexts)
+                    }
+                }
+
                 TabRow(
                     selectedTabIndex = currentTab,
                     contentColor = White,
