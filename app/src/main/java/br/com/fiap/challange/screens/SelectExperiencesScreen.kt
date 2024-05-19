@@ -39,10 +39,12 @@ import br.com.fiap.challange.constants.interesstsList
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SelectExperiencesScreen(navController: NavController) {
+fun SelectExperiencesScreen(onNext: (values:List<String>)->Unit) {
+
     var experienceList = remember {
         mutableStateListOf<String>()
     }
+
 
     Box(
         Modifier
@@ -58,7 +60,7 @@ fun SelectExperiencesScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onNext(experienceList)  },
                 modifier = Modifier
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(16.dp),
@@ -107,7 +109,7 @@ fun SelectExperiencesScreen(navController: NavController) {
         Row {
 
             Text(
-                "Quais assuntos deseja aprender?",
+                "Quais assuntos você deseja ministrar aulas?",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -118,7 +120,7 @@ fun SelectExperiencesScreen(navController: NavController) {
                     experienceList.add(value)
                 }
             },
-            label = "Digite seus interesses",
+            label = "Digite suas experiências",
             writableSelect = true,
             items = interesstsList
         )

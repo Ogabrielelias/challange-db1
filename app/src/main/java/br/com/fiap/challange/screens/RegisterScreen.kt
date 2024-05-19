@@ -125,38 +125,18 @@ fun RegisterScreen(navController: NavController) {
 @Composable
 fun FormRegister(onSend: (message: String) -> Unit) {
     val context = LocalContext.current
-    val userRepository = UserRepository(context)
-    val interestRepository = InterestRepository(context)
+    val userRepository = remember { UserRepository(context) }
+    val scope = rememberCoroutineScope()
 
     var error = remember { mutableStateOf(false) }
 
-    var nomeValue = remember {
-        mutableStateOf("")
-    }
-
-    var idadeValue = remember {
-        mutableStateOf("")
-    }
-
-    var generoValue = remember {
-        mutableStateOf("")
-    }
-
-    var emailValue = remember {
-        mutableStateOf("")
-    }
-
-    var senhaValue = remember {
-        mutableStateOf("")
-    }
-
-    var confirmarSenhaValue = remember {
-        mutableStateOf("")
-    }
-
-    var tipoValue = remember {
-        mutableStateOf("")
-    }
+    var nomeValue = remember { mutableStateOf("") }
+    var idadeValue = remember { mutableStateOf("") }
+    var generoValue = remember { mutableStateOf("") }
+    var emailValue = remember { mutableStateOf("") }
+    var senhaValue = remember { mutableStateOf("") }
+    var confirmarSenhaValue = remember { mutableStateOf("") }
+    var tipoValue = remember { mutableStateOf("") }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -168,20 +148,22 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Nome",
                 value = nomeValue.value,
                 onChange = { value ->
-                    nomeValue.value = value
+                    nomeValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
-                isError = error.value
+                isError = error.value,
+                singleLine = true,
             )
 
             Input(
                 label = "Idade",
                 value = idadeValue.value,
                 onChange = { value ->
-                    idadeValue.value = value
+                    idadeValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
                 isError = error.value,
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
@@ -198,9 +180,10 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Email",
                 value = emailValue.value,
                 onChange = { value ->
-                    emailValue.value = value
+                    emailValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
+                singleLine = true,
                 isError = error.value
             )
 
@@ -212,6 +195,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 isError = error.value
             )
 
@@ -219,10 +203,11 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                 label = "Confirmar Senha",
                 value = confirmarSenhaValue.value,
                 onChange = { value ->
-                    confirmarSenhaValue.value = value
+                    confirmarSenhaValue.value = value.replace("\n+".toRegex(), replacement = "")
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 isError = error.value
             )
 
@@ -237,8 +222,8 @@ fun FormRegister(onSend: (message: String) -> Unit) {
         }
 
         Button(
-            onClick = { ->
-                try {
+            onClick = {
+                scope.launch {
                     var message = ""
 
                     if (senhaValue.value != confirmarSenhaValue.value) {
@@ -248,20 +233,16 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                         confirmarSenhaValue.value.length < 3 ||
                         nomeValue.value.length < 3 ||
                         idadeValue.value.toInt() < 14 ||
-                        generoValue.value == "" ||
-                        tipoValue.value == ""
+                        generoValue.value.isEmpty() ||
+                        tipoValue.value.isEmpty()
                     ) {
                         message = "Preencha todos os campos corretamente!"
                     } else {
-                        val user = userRepository.getUserByEmail(
-                            email = emailValue.value
-                        )
+                        val user = userRepository.getUserByEmail(emailValue.value)
 
                         if (user == null) {
-                            val isStudent =
-                                if (generoValue.value == "Aluno" || generoValue.value == "Ambos") 1 else 0
-                            val isMentor =
-                                if (generoValue.value == "Mentor" || generoValue.value == "Ambos") 1 else 0
+                            val isStudent = if (tipoValue.value == "Aluno" || tipoValue.value == "Ambos") 1 else 0
+                            val isMentor = if (tipoValue.value == "Mentor" || tipoValue.value == "Ambos") 1 else 0
 
                             userRepository.save(
                                 User(
@@ -291,9 +272,6 @@ fun FormRegister(onSend: (message: String) -> Unit) {
                     }
 
                     onSend(message)
-                } catch (err: Throwable) {
-                    println(err)
-                    onSend("Erro de conexão com o servidor!")
                 }
             },
             shape = RoundedCornerShape(10.dp),

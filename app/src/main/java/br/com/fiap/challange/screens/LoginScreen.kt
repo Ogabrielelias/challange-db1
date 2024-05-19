@@ -40,10 +40,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.R
 import br.com.fiap.challange.database.repository.UserRepository
+import br.com.fiap.challange.manager.UserManager
 import br.com.fiap.challange.model.User
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.ui.theme.MainBlue
@@ -55,7 +57,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, userManager: UserManager) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -105,12 +107,21 @@ fun LoginScreen(navController: NavController) {
                     )
 
                 }
-                FormLogin(onSend = { status ->
+                FormLogin(onSend = { status, user ->
                     var message = "Login efetuado!"
                     if (!status) {
                         message = "E-mail e/ou Senha Inválido!"
                     } else {
-                        navController.navigate("search")
+                        if (user!!.interests.isEmpty() && user.user.isStudent == 1) {
+                            navController.navigate("interestRegister/${user.user.id}")
+                        } else if (user.experiences.isEmpty() && user.user.isMentor == 1) {
+                            navController.navigate("experienceRegister/${user.user.id}")
+                        } else {
+                            navController.navigate("search")
+                            GlobalScope.launch {
+                                userManager.storeUser(user.user.name, user.user.isMentor?: 0, user.user.isStudent?: 0)
+                            }
+                        }
                     }
                     scope.launch {
                         snackbarHostState.showSnackbar(
@@ -152,19 +163,20 @@ fun validateLoginInputs(email: String, senha: String): Boolean {
 }
 
 @Composable
-fun FormLogin(onSend: (status: Boolean) -> Unit) {
-        val context = LocalContext.current
+
+fun FormLogin(onSend: (status: Boolean, user: UserWithExperiencesAndInterests?) -> Unit) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var error = remember { mutableStateOf(false) }
+    val error = remember { mutableStateOf(false) }
 
     val buttonDisabled = remember { mutableStateOf(true) }
 
-    var emailValue = remember {
+    val emailValue = remember {
         mutableStateOf("")
     }
 
-    var senhaValue = remember {
+    val senhaValue = remember {
         mutableStateOf("")
     }
 
@@ -178,7 +190,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                 label = "Email",
                 value = emailValue.value,
                 onChange = { value ->
-                    emailValue.value = value
+                    emailValue.value = value.replace("\n+".toRegex(), replacement = "")
                     buttonDisabled.value = !validateLoginInputs(
                         value,
                         senhaValue.value
@@ -186,6 +198,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                     error.value = false
                 },
                 frontImage = R.drawable.mail,
+                singleLine = true,
                 isError = error.value
             )
 
@@ -193,7 +206,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                 label = "Senha",
                 value = senhaValue.value,
                 onChange = { value ->
-                    senhaValue.value = value
+                    senhaValue.value = value.replace("\n+".toRegex(), replacement = "")
                     buttonDisabled.value = !validateLoginInputs(
                         emailValue.value,
                         value
@@ -201,6 +214,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                     error.value = false
                 },
                 type = "password",
+                singleLine = true,
                 frontImage = R.drawable.lock,
                 isError = error.value
             )
@@ -210,7 +224,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
             onClick = { ->
                 try {
                     scope.launch {
-                        val user: User = login(
+                        val user: UserWithExperiencesAndInterests = login(
                             context = context,
                             email = emailValue.value,
                             senha = senhaValue.value
@@ -223,7 +237,7 @@ fun FormLogin(onSend: (status: Boolean) -> Unit) {
                             senhaValue.value = ""
                         }
 
-                        onSend(user != null)
+                        onSend(user != null, user)
                     }
                 } catch (err: Throwable) {
                     println(err)
@@ -251,7 +265,7 @@ suspend fun login(
     context: Context,
     email: String,
     senha: String
-): User {
+): UserWithExperiencesAndInterests {
     val userRepository = UserRepository(context)
     val user = userRepository.getUserByLogin(
         email = "alexandre-ferreira@example.com",

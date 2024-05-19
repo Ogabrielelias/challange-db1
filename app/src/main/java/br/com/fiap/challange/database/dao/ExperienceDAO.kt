@@ -12,14 +12,17 @@ import br.com.fiap.challange.model.Interest
 interface ExperienceDAO {
 
     @Insert
-    fun save(user: Interest): Long
+    fun save(user: Experience): Long
 
     @Update
-    fun update(user: Interest): Int
+    fun update(user: Experience): Int
 
     @Delete
-    fun delete(user: Interest): Int
+    fun delete(user: Experience): Int
 
     @Query("SELECT * FROM tb_experience WHERE id = :id")
     fun getExperienceById(id: Int): Experience
+
+    @Query("SELECT * FROM tb_experience WHERE userId = :id")
+    fun getExperiencesByUserId(id: Long): List<Experience>
 }
