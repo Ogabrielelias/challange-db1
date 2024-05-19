@@ -22,6 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.challange.screens.TabNavigationScreen
 import br.com.fiap.challange.ui.theme.ChallangeTheme
+import br.com.fiap.challange.utils.generateNotificationMessage
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -45,15 +46,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun sendNotification(role:String, person:String, subject:String) {
+    private fun sendNotification(role: String, person: String, subject: String, notificationText:String) {
 
-        val notificationTexts = listOf(
-            "Você encontrou um novo ${role}!",
-            "Um novo ${role} foi encontrado!",
-            "Parabéns! Você conseguiu um match!",
-            "Você conseguiu um novo ${role}!",
-            "Você encontrou um ${role} brilhante!"
-            )
+
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -63,11 +58,11 @@ class MainActivity : ComponentActivity() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        var roleText = if(role == "mentor") "ensinar" else "aprender"
+        var roleText = if (role == "mentor") "ensinar" else "aprender"
 
         val builder = NotificationCompat.Builder(this, CHANNELID)
             .setSmallIcon(R.drawable.compasswhite)
-            .setContentTitle(notificationTexts.random())
+            .setContentTitle(notificationText)
             .setContentText("${person} gostaria de ${roleText} ${subject} a você.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
@@ -89,7 +84,16 @@ class MainActivity : ComponentActivity() {
                     color = Color.White
                 ) {
                     val navController = rememberNavController()
-                    TabNavigationScreen(navController, sendNotification = { role, person, subject -> sendNotification(role, person, subject) });
+                    TabNavigationScreen(
+                        navController,
+                        sendNotification = { role, person, subject, message ->
+                            sendNotification(
+                                role,
+                                person,
+                                subject,
+                                message
+                            )
+                        });
                 }
             }
         }

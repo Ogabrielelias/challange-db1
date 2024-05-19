@@ -53,12 +53,16 @@ import br.com.fiap.challange.ui.theme.Gray50
 import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.White
+import br.com.fiap.challange.utils.generateNotificationMessage
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabNavigationScreen(navController: NavHostController, sendNotification : (role:String, person:String, subject:String)->Unit) {
+fun TabNavigationScreen(
+    navController: NavHostController,
+    sendNotification: (role: String, person: String, subject: String, message: String) -> Unit
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -71,7 +75,9 @@ fun TabNavigationScreen(navController: NavHostController, sendNotification : (ro
                 LaunchedEffect(Unit) {
                     while (true) {
                         delay(60000)
-                        sendNotification("mentor","Matheus", "programação")
+                        val role = "mentor"
+                        val notificationTexts = generateNotificationMessage(role)
+                        sendNotification(role, "Matheus", "programação", notificationTexts)
                     }
                 }
 
@@ -104,7 +110,7 @@ fun TabNavigationScreen(navController: NavHostController, sendNotification : (ro
                                     .clip(shape = RoundedCornerShape(40.dp))
                                     .background(if (currentRoute == "search") MainBlue else White)
                                     .size(48.dp),
-                                ) {
+                            ) {
                                 Image(
                                     painter = painterResource(if (currentRoute == "search") R.drawable.searchwhite else R.drawable.search),
                                     contentDescription = "search",
