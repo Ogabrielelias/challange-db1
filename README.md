@@ -1,8 +1,8 @@
-# "Tinder de Mentores e Aprendizes"
+# EDUCO
 
 ## Visão Geral
 
-Bem-vindo ao "Tinder de Mentores e Aprendizes", uma solução desenvolvida a partir do desafio proposto pela DB1. Este aplicativo tem o potencial de ser expandido para diversas áreas educacionais, incluindo alunos de cursos técnicos, cursos de curta duração, graduação, pós-graduação (lato sensu e stricto sensu), e outras segmentações pertinentes.
+Bem-vindo ao Educo, uma solução desenvolvida a partir do desafio proposto pela DB1. Este aplicativo tem o potencial de ser expandido para diversas áreas educacionais, incluindo alunos de cursos técnicos, cursos de curta duração, graduação, pós-graduação (lato sensu e stricto sensu), e outras segmentações pertinentes.
 
 O objetivo do aplicativo é facilitar a conexão entre mentores e aprendizes, proporcionando um ambiente onde ambos possam cadastrar seus perfis e temas de interesse. Por meio de um processo atrativo de matchmaking, o aplicativo realiza o match entre mentor, aprendiz e o tema desejado, promovendo o desenvolvimento pessoal e profissional de todos os envolvidos.
 
@@ -25,6 +25,6 @@ O objetivo do aplicativo é facilitar a conexão entre mentores e aprendizes, pr
 
 ## Conclusão
 
-O Tinder de Mentores e Aprendizes é mais do que um simples aplicativo; é uma plataforma que promove o crescimento profissional e acadêmico por meio de conexões significativas. Ao reunir mentores e aprendizes com interesses e objetivos comuns, criamos um ambiente propício para o compartilhamento de conhecimento e o desenvolvimento contínuo.
+O Educo é mais do que um simples aplicativo; é uma plataforma que promove o crescimento profissional e acadêmico por meio de conexões significativas. Ao reunir mentores e aprendizes com interesses e objetivos comuns, criamos um ambiente propício para o compartilhamento de conhecimento e o desenvolvimento contínuo.
 
 Estamos entusiasmados em ver como essa solução pode transformar a maneira como mentores e aprendizes se conectam e colaboram. Junte-se a nós nessa jornada e aproveite ao máximo essa experiência inovadora!
