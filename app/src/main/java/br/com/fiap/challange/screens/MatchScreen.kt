@@ -542,6 +542,18 @@ fun MatchScreen(
                                                         requestType = "mentor"
                                                     )
                                                 )
+                                                notificationRepository.save(
+                                                    Notification(
+                                                        frontIcon = emojisList.random(),
+                                                        hasSeen = 0,
+                                                        message = generateNotificationMessage("mentor"),
+                                                        commomSubject = matchQueue[0].subject,
+                                                        fromUserId = currentMatch[0].userMentorId,
+                                                        toUserId = userValue!!.user.id,
+                                                        hasReceived = 0,
+                                                        requestType = "aluno"
+                                                    )
+                                                )
                                             } else if (selected == "Alunos" && currentMatch[0].studentHasMatch == 1) {
                                                 notificationRepository.save(
                                                     Notification(
@@ -553,6 +565,19 @@ fun MatchScreen(
                                                         toUserId = currentMatch[0].userStudentId,
                                                         hasReceived = 0,
                                                         requestType = "aluno"
+                                                    )
+                                                )
+
+                                                notificationRepository.save(
+                                                    Notification(
+                                                        frontIcon = emojisList.random(),
+                                                        hasSeen = 0,
+                                                        message = generateNotificationMessage("aluno"),
+                                                        commomSubject = matchQueue[0].subject,
+                                                        fromUserId = currentMatch[0].userStudentId,
+                                                        toUserId = userValue!!.user.id,
+                                                        hasReceived = 0,
+                                                        requestType = "mentor"
                                                     )
                                                 )
                                             }
