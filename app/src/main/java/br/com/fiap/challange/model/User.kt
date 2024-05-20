@@ -34,6 +34,7 @@ val interests: List<Interest> = emptyList()
 
 data class MatchUserStudent(
     val id: Long = 0,
+    val userId : Long,
     val name: String = "",
     val subject: String = "",
     val level: Int,

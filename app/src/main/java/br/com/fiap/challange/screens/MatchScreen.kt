@@ -113,6 +113,7 @@ fun MatchScreen(
                 uniqueMatches.add(
                     MatchUserStudent(
                         id = userMatch.id,
+                        userId = userMatch.id,
                         name = userMatch.name,
                         subject = userMatch.userInterest,
                         level = userMatch.interestLevel,
@@ -140,6 +141,7 @@ fun MatchScreen(
                 uniqueMatches.add(
                     MatchUserStudent(
                         id = userMatch.id,
+                        userId = userMatch.id,
                         name = userMatch.name,
                         subject = userMatch.userExperience,
                         level = userMatch.experienceLevel,
@@ -455,8 +457,8 @@ fun MatchScreen(
                             scope.launch {
                                 if (matchQueue.isNotEmpty()) {
                                     val currentMatch =
-                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                        (if (selected == "Mentores") matchQueue[0].userId else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].userId)?.let { studentId ->
                                                 matchRepository.getMatchesByMentorStudentAndSubject(
                                                     matchSubject = matchQueue[0].subject,
                                                     mentorId = mentorId,
@@ -469,8 +471,8 @@ fun MatchScreen(
                                         userValue?.user?.let {
                                             Match(
                                                 id = currentMatch[0].id,
-                                                userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
-                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
+                                                userMentorId = if (selected == "Mentores") matchQueue[0].userId else it.id,
+                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].userId,
                                                 studentHasMatch = if (selected == "Mentores") 0 else currentMatch[0].studentHasMatch,
                                                 mentorHasMatch = if (selected == "Alunos") 0 else currentMatch[0].mentorHasMatch,
                                                 matchSubject = matchQueue[0].subject
@@ -479,8 +481,8 @@ fun MatchScreen(
                                             matchRepository.update(it)
                                         }
                                     } else {
-                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                        (if (selected == "Mentores") matchQueue[0].userId else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].userId)?.let { studentId ->
                                                 Match(
                                                     userMentorId = mentorId,
                                                     userStudentId = studentId,
@@ -506,8 +508,8 @@ fun MatchScreen(
                             scope.launch {
                                 if (matchQueue.isNotEmpty()) {
                                     val currentMatch =
-                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                        (if (selected == "Mentores") matchQueue[0].userId else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].userId)?.let { studentId ->
                                                 matchRepository.getMatchesByMentorStudentAndSubject(
                                                     matchSubject = matchQueue[0].subject,
                                                     mentorId = mentorId,
@@ -520,8 +522,8 @@ fun MatchScreen(
                                         userValue?.user?.let {
                                             val match = Match(
                                                 id = currentMatch[0].id,
-                                                userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
-                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
+                                                userMentorId = if (selected == "Mentores") matchQueue[0].userId else it.id,
+                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].userId,
                                                 studentHasMatch = if (selected == "Mentores") 1 else currentMatch[0].studentHasMatch,
                                                 mentorHasMatch = if (selected == "Alunos") 1 else currentMatch[0].mentorHasMatch,
                                                 matchSubject = matchQueue[0].subject
@@ -560,8 +562,8 @@ fun MatchScreen(
                                             matchRepository.update(it)
                                         }
                                     } else {
-                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                        (if (selected == "Mentores") matchQueue[0].userId else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].userId)?.let { studentId ->
                                                 Match(
                                                     userMentorId = mentorId,
                                                     userStudentId = studentId,

@@ -80,7 +80,7 @@ fun TabNavigationScreen(
                         delay(5000)
                         val lastNotification =
                             notificationRepository.getLastNewNotificationsFromUserId(loggedUser!!.user.id)
-
+                        println(lastNotification)
                         if (lastNotification !== null) {
                             val role = lastNotification.requestType
                             val userWantTo = if (role == "mentor") "aprender" else "ensinar"
