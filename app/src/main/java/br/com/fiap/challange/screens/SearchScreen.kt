@@ -103,7 +103,7 @@ fun SearchScreen(navController: NavController) {
                     context = context,
                     onSearch = { users ->
                         usersList.clear()
-                        usersList.addAll(users)
+                        usersList.addAll(users.toSet())
                     },
                     searchTerm = searchValue.value.ifBlank { null },
                     isMentor = isMentor,
@@ -152,7 +152,7 @@ fun SearchScreen(navController: NavController) {
                                 context = context,
                                 onSearch = { users ->
                                     usersList.clear()
-                                    usersList.addAll(users)
+                                    usersList.addAll(users.toSet())
                                 },
                                 searchTerm = searchValue.value.ifBlank { null },
                                 isMentor = isMentor,
