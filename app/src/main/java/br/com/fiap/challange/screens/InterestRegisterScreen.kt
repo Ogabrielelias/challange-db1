@@ -123,7 +123,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
                                             if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
                                                 navController.navigate("experienceRegister/${userId}")
                                             } else {
-                                                navController.navigate("search")
+                                                navController.navigate("match")
                                             }
                                         }
                                     } catch (err: Throwable) {

@@ -107,7 +107,7 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, 
 
                                         saveJobs.awaitAll()
 
-                                        navController.navigate("search")
+                                        navController.navigate("match")
                                     } catch (err: Throwable) {
                                         isLoading.value = false
                                         scope.launch {
