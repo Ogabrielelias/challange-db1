@@ -166,6 +166,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
             )
 
             Select(
+                value = generoValue.value,
                 label = "Gênero",
                 items = listOf("Masculino", "Feminino", "Outro"),
                 onSelect = { value ->
@@ -210,6 +211,7 @@ fun FormRegister(onSend: (message: String) -> Unit) {
             )
 
             Select(
+                value = tipoValue.value,
                 label = "Deseja ser mentor e/ou aluno?",
                 items = userRoleList,
                 onSelect = { value ->

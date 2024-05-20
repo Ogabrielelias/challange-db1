@@ -40,3 +40,31 @@ data class MatchUserStudent(
     val description: String,
     val othersList: List<String>
 )
+
+data class StudentToMatch(
+    val id: Long,
+    val name: String,
+    val email: String,
+    val password: String,
+    val age: Int,
+    val genre: String,
+    val isMentor: Int?,
+    val isStudent: Int?,
+    val userInterest: String,
+    val interestLevel: Int,
+    val interestDescription: String,
+)
+
+data class MentorToMatch(
+    val id: Long,
+    val name: String,
+    val email: String,
+    val password: String,
+    val age: Int,
+    val genre: String,
+    val isMentor: Int?,
+    val isStudent: Int?,
+    val userExperience: String,
+    val experienceLevel: Int,
+    val experienceDescription: String,
+)

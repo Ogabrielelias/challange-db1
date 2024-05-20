@@ -57,6 +57,8 @@ import androidx.compose.ui.zIndex
 import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
 import br.com.fiap.challange.constants.emojisList
+import br.com.fiap.challange.database.repository.ExperienceRepository
+import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.database.repository.MatchRepository
 import br.com.fiap.challange.database.repository.NotificationRepository
 import br.com.fiap.challange.database.repository.UserRepository
@@ -79,6 +81,8 @@ fun MatchScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val userRepository = UserRepository(context)
+    val interestRepository = InterestRepository(context)
+    val experienceRepository = ExperienceRepository(context)
     val matchRepository = MatchRepository(context)
     val notificationRepository = NotificationRepository(context)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -98,33 +102,26 @@ fun MatchScreen(
         }
     }
 
-    LaunchedEffect(selected) {
+    LaunchedEffect(matchQueue) {
         if (selected == "Alunos") {
             val usersToMatch = userRepository.getStudentsToMatchFromExperiences(
                 userValue?.experiences!!.map { it.experience },
                 userValue?.user!!.id
             )
 
-            usersToMatch.forEach { user ->
-                userValue?.experiences
-                    ?.map { it.experience }
-                    ?.intersect(user.interests.map {
-                        it.interest
-                    }.toSet())?.forEach { subject ->
-                        val userInterest = user.interests.find { it.interest == subject }
-
-                        uniqueMatches.add(
-                            MatchUserStudent(
-                                id = user.user.id,
-                                name = user.user.name,
-                                subject = subject,
-                                level = userInterest!!.level,
-                                description = userInterest.description,
-                                othersList = user.interests.map { it.interest }
-                                    .filter { it != subject }
-                            )
-                        )
-                    }
+            usersToMatch.forEach { userMatch ->
+                uniqueMatches.add(
+                    MatchUserStudent(
+                        id = userMatch.id,
+                        name = userMatch.name,
+                        subject = userMatch.userInterest,
+                        level = userMatch.interestLevel,
+                        description = userMatch.interestDescription,
+                        othersList = interestRepository.getInterestByUserId(userMatch.id)
+                            .map { it.interest }
+                            .filter { it != userMatch.userInterest }
+                    )
+                )
             }
 
             matchQueue.clear()
@@ -139,27 +136,24 @@ fun MatchScreen(
 
             matchQueue.clear()
 
-            usersToMatch.forEach { user ->
-                userValue?.interests
-                    ?.map { it.interest }
-                    ?.intersect(user.experiences.map {
-                        it.experience
-                    }.toSet())?.forEach { subject ->
-                        val userInterest = user.experiences.find { it.experience == subject }
-
-                        matchQueue.add(
-                            MatchUserStudent(
-                                id = user.user.id,
-                                name = user.user.name,
-                                subject = subject,
-                                level = userInterest!!.level,
-                                description = userInterest.description,
-                                othersList = user.experiences.map { it.experience }
-                                    .filter { it != subject }
-                            )
-                        )
-                    }
+            usersToMatch.forEach { userMatch ->
+                uniqueMatches.add(
+                    MatchUserStudent(
+                        id = userMatch.id,
+                        name = userMatch.name,
+                        subject = userMatch.userExperience,
+                        level = userMatch.experienceLevel,
+                        description = userMatch.experienceDescription,
+                        othersList = experienceRepository.getExperiencesByUserId(userMatch.id)
+                            .map { it.experience }
+                            .filter { it != userMatch.userExperience }
+                    )
+                )
             }
+
+            matchQueue.clear()
+            matchQueue.addAll(uniqueMatches.toSet())
+            uniqueMatches.clear()
         }
     }
 
@@ -423,7 +417,7 @@ fun MatchScreen(
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         Text(
                             text = "A procura de novos ${selected.lowercase()}.",
                             modifier = Modifier
@@ -533,28 +527,32 @@ fun MatchScreen(
                                                 matchSubject = matchQueue[0].subject
                                             )
 
-                                            if(selected == "Mentores" && currentMatch[0].mentorHasMatch == 1){
-                                                notificationRepository.save(Notification(
-                                                    frontIcon = emojisList.random(),
-                                                    hasSeen = 0,
-                                                    message = generateNotificationMessage("aluno"),
-                                                    commomSubject = matchQueue[0].subject,
-                                                    fromUserId = userValue!!.user.id,
-                                                    toUserId = currentMatch[0].id,
-                                                    hasReceived = 0,
-                                                    requestType = "mentor"
-                                                ))
-                                            }else if(selected == "Alunos" && currentMatch[0].studentHasMatch == 1){
-                                                notificationRepository.save(Notification(
-                                                    frontIcon = emojisList.random(),
-                                                    hasSeen = 0,
-                                                    message = generateNotificationMessage("mentor"),
-                                                    commomSubject = matchQueue[0].subject,
-                                                    fromUserId = userValue!!.user.id,
-                                                    toUserId = currentMatch[0].id,
-                                                    hasReceived = 0,
-                                                    requestType = "aluno"
-                                                ))
+                                            if (selected == "Mentores" && currentMatch[0].mentorHasMatch == 1) {
+                                                notificationRepository.save(
+                                                    Notification(
+                                                        frontIcon = emojisList.random(),
+                                                        hasSeen = 0,
+                                                        message = generateNotificationMessage("aluno"),
+                                                        commomSubject = matchQueue[0].subject,
+                                                        fromUserId = userValue!!.user.id,
+                                                        toUserId = currentMatch[0].id,
+                                                        hasReceived = 0,
+                                                        requestType = "mentor"
+                                                    )
+                                                )
+                                            } else if (selected == "Alunos" && currentMatch[0].studentHasMatch == 1) {
+                                                notificationRepository.save(
+                                                    Notification(
+                                                        frontIcon = emojisList.random(),
+                                                        hasSeen = 0,
+                                                        message = generateNotificationMessage("mentor"),
+                                                        commomSubject = matchQueue[0].subject,
+                                                        fromUserId = userValue!!.user.id,
+                                                        toUserId = currentMatch[0].id,
+                                                        hasReceived = 0,
+                                                        requestType = "aluno"
+                                                    )
+                                                )
                                             }
 
                                             match

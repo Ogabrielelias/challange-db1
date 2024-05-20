@@ -2,6 +2,8 @@ package br.com.fiap.challange.database.repository
 
 import android.content.Context
 import br.com.fiap.challange.database.dao.AppDatabase
+import br.com.fiap.challange.model.MentorToMatch
+import br.com.fiap.challange.model.StudentToMatch
 import br.com.fiap.challange.model.User
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import kotlinx.coroutines.Dispatchers
@@ -59,13 +61,13 @@ class UserRepository(context: Context) {
         }
     }
 
-    suspend fun getStudentsToMatchFromExperiences(experienceList: List<String>, mentorId:Long): List<UserWithExperiencesAndInterests> {
+    suspend fun getStudentsToMatchFromExperiences(experienceList: List<String>, mentorId:Long): List<StudentToMatch> {
         return withContext(Dispatchers.IO) {
             db.getStudentsToMatchFromExperiences(experienceList, mentorId)
         }
     }
 
-    suspend fun getMentorToMatchFromInterests(interestsList: List<String>, mentorId:Long): List<UserWithExperiencesAndInterests> {
+    suspend fun getMentorToMatchFromInterests(interestsList: List<String>, mentorId:Long): List<MentorToMatch> {
         return withContext(Dispatchers.IO) {
             db.getMentorToMatchFromInterests(interestsList, mentorId)
         }

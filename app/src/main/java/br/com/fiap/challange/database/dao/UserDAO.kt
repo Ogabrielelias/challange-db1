@@ -5,6 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import br.com.fiap.challange.model.MentorToMatch
+import br.com.fiap.challange.model.StudentToMatch
 import br.com.fiap.challange.model.User
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 
@@ -67,7 +69,7 @@ interface UserDAO {
     ): List<UserWithExperiencesAndInterests>
 
     @Query("""
-        SELECT DISTINCT u.*, e.experience AS user_experience, i.interest AS user_interest
+        SELECT DISTINCT u.id, u.name, u.email, u.password, u.age, u.genre, u.isMentor, u.isStudent, e.experience AS userExperience, e.level as experienceLevel, e.description as experienceDescription
         FROM tb_user u
         LEFT JOIN tb_experience e ON u.id = e.userId
         LEFT JOIN tb_interest i ON u.id = i.userId
@@ -86,10 +88,10 @@ interface UserDAO {
                 ELSE 3
             END
     """)
-    fun getMentorToMatchFromInterests(interestList: List<String>, id: Long): List<UserWithExperiencesAndInterests>
+    fun getMentorToMatchFromInterests(interestList: List<String>, id: Long): List<MentorToMatch>
 
     @Query("""
-        SELECT DISTINCT u.*, e.experience AS user_experience, i.interest AS user_interest
+        SELECT DISTINCT u.id, u.name, u.email, u.password, u.age, u.genre, u.isMentor, u.isStudent, i.interest AS userInterest, i.level as interestLevel, i.description as interestDescription
         FROM tb_user u
         LEFT JOIN tb_experience e ON u.id = e.userId
         LEFT JOIN tb_interest i ON u.id = i.userId
@@ -108,5 +110,5 @@ interface UserDAO {
                 ELSE 3
             END
     """)
-    fun getStudentsToMatchFromExperiences(experienceList: List<String>, id:Long): List<UserWithExperiencesAndInterests>
+    fun getStudentsToMatchFromExperiences(experienceList: List<String>, id:Long): List<StudentToMatch>
 }
