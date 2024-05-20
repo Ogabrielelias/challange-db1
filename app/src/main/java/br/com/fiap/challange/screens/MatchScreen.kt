@@ -458,44 +458,29 @@ fun MatchScreen(
                         try {
                             scope.launch {
                                 if (matchQueue.isNotEmpty()) {
-                                    val currentMatch = (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                        (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
-                                            matchRepository.getMatchesByMentorStudentAndSubject(
-                                                matchSubject = matchQueue[0].subject,
-                                                mentorId = mentorId,
-                                                studentId = studentId
-                                            )
-                                        }
-                                    }
-
-                                    if (currentMatch != null) {
-                                        if (currentMatch.isNotEmpty()) {
-                                            userValue?.user?.let {
-                                                Match(
-                                                    id = currentMatch[0].id,
-                                                    userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
-                                                    userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
-                                                    studentHasMatch = if (selected == "Mentores") 0 else null,
-                                                    mentorHasMatch = if (selected == "Alunos") 0 else null,
-                                                    matchSubject = matchQueue[0].subject
+                                    val currentMatch =
+                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                                matchRepository.getMatchesByMentorStudentAndSubject(
+                                                    matchSubject = matchQueue[0].subject,
+                                                    mentorId = mentorId,
+                                                    studentId = studentId
                                                 )
-                                            }?.let {
-                                                matchRepository.update(it)
                                             }
-                                        } else {
-                                            (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
-                                                (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
-                                                    Match(
-                                                        userMentorId = mentorId,
-                                                        userStudentId = studentId,
-                                                        studentHasMatch = if (selected == "Mentores") 0 else null,
-                                                        mentorHasMatch = if (selected == "Alunos") 0 else null,
-                                                        matchSubject = matchQueue[0].subject
-                                                    )
-                                                }
-                                            }?.let {
-                                                matchRepository.save(it)
-                                            }
+                                        }
+
+                                    if (currentMatch != null && currentMatch.isNotEmpty()) {
+                                        userValue?.user?.let {
+                                            Match(
+                                                id = currentMatch[0].id,
+                                                userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
+                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
+                                                studentHasMatch = if (selected == "Mentores") 0 else currentMatch[0].studentHasMatch,
+                                                mentorHasMatch = if (selected == "Alunos") 0 else currentMatch[0].mentorHasMatch,
+                                                matchSubject = matchQueue[0].subject
+                                            )
+                                        }?.let {
+                                            matchRepository.update(it)
                                         }
                                     } else {
                                         (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
@@ -521,7 +506,54 @@ fun MatchScreen(
                         }
                     })
                     LikeButton(onClick = {
+                        try {
+                            scope.launch {
+                                if (matchQueue.isNotEmpty()) {
+                                    val currentMatch =
+                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                                matchRepository.getMatchesByMentorStudentAndSubject(
+                                                    matchSubject = matchQueue[0].subject,
+                                                    mentorId = mentorId,
+                                                    studentId = studentId
+                                                )
+                                            }
+                                        }
 
+                                    if (currentMatch != null && currentMatch.isNotEmpty()) {
+                                        userValue?.user?.let {
+                                            Match(
+                                                id = currentMatch[0].id,
+                                                userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
+                                                userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
+                                                studentHasMatch = if (selected == "Mentores") 1 else currentMatch[0].studentHasMatch,
+                                                mentorHasMatch = if (selected == "Alunos") 1 else currentMatch[0].mentorHasMatch,
+                                                matchSubject = matchQueue[0].subject
+                                            )
+                                        }?.let {
+                                            matchRepository.update(it)
+                                        }
+                                    } else {
+                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                                Match(
+                                                    userMentorId = mentorId,
+                                                    userStudentId = studentId,
+                                                    studentHasMatch = if (selected == "Mentores") 1 else null,
+                                                    mentorHasMatch = if (selected == "Alunos") 1 else null,
+                                                    matchSubject = matchQueue[0].subject
+                                                )
+                                            }
+                                        }?.let {
+                                            matchRepository.save(it)
+                                        }
+                                    }
+                                    matchQueue.removeAt(0)
+                                }
+                            }
+                        } catch (err: Throwable) {
+                            println(err)
+                        }
                     })
                 }
                 Spacer(modifier = Modifier.height(70.dp))
