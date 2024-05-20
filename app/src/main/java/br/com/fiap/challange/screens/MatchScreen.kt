@@ -537,7 +537,7 @@ fun MatchScreen(
                                                         message = generateNotificationMessage("aluno"),
                                                         commomSubject = matchQueue[0].subject,
                                                         fromUserId = userValue!!.user.id,
-                                                        toUserId = currentMatch[0].id,
+                                                        toUserId = currentMatch[0].userMentorId,
                                                         hasReceived = 0,
                                                         requestType = "mentor"
                                                     )
@@ -550,7 +550,7 @@ fun MatchScreen(
                                                         message = generateNotificationMessage("mentor"),
                                                         commomSubject = matchQueue[0].subject,
                                                         fromUserId = userValue!!.user.id,
-                                                        toUserId = currentMatch[0].id,
+                                                        toUserId = currentMatch[0].userStudentId,
                                                         hasReceived = 0,
                                                         requestType = "aluno"
                                                     )
