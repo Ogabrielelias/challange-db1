@@ -67,7 +67,7 @@ fun TabNavigationScreen(
         containerColor = Color.Transparent,
         bottomBar = {
             // No listOf abaixo adicionar as rotas que possuirão as tabs de navegação
-            if (currentRoute in listOf("search", "profile/{profileId}", "match")) {
+            if (currentRoute in listOf("search", "profile/{profileId}", "match", "notifications")) {
                 val permissionState =
                     rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
@@ -84,10 +84,11 @@ fun TabNavigationScreen(
                         if (lastNotification !== null) {
                             val role = lastNotification.requestType
                             val userWantTo = if (role == "mentor") "aprender" else "ensinar"
+                            val preposition = if (role == "aluno") "a" else "com"
 
                             sendNotification(
                                 lastNotification.message,
-                                "${lastNotification.fromUserName} gostaria de ${userWantTo} ${lastNotification.commomSubject} com você."
+                                "${lastNotification.fromUserName} gostaria de ${userWantTo} ${lastNotification.commomSubject} ${preposition} você."
                             )
 
                             notificationRepository.markNotificationAsReceived(lastNotification.id)
@@ -152,19 +153,19 @@ fun TabNavigationScreen(
                         },
                     )
                     Tab(
-                        selected = currentRoute == "tab3",
-                        onClick = { navController.navigate("tab3"); currentTab = 2 },
+                        selected = currentRoute == "notifications",
+                        onClick = { navController.navigate("notifications"); currentTab = 2 },
                         text = {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
                                     .clip(shape = RoundedCornerShape(48.dp))
-                                    .background(if (currentRoute == "tab3") MainBlue else White)
+                                    .background(if (currentRoute == "notifications") MainBlue else White)
                                     .size(40.dp),
 
                                 ) {
                                 Image(
-                                    painter = painterResource(if (currentRoute == "tab3") R.drawable.bellwhite else R.drawable.bell),
+                                    painter = painterResource(if (currentRoute == "notifications") R.drawable.bellwhite else R.drawable.bell),
                                     contentDescription = "bell",
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -210,6 +211,12 @@ fun TabNavigationScreen(
                     navController = navController,
                     user = loggedUser,
                     sharedViewModel = sharedViewModel
+                )
+            }
+            composable("notifications") {
+                NotificationsScreen(
+                    navController = navController,
+                    user = loggedUser
                 )
             }
         }

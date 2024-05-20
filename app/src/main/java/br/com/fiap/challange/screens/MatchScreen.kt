@@ -69,16 +69,22 @@ import br.com.fiap.challange.ui.theme.Purple100
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.zIndex
 import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
+import br.com.fiap.challange.constants.emojisList
 import br.com.fiap.challange.database.repository.MatchRepository
+import br.com.fiap.challange.database.repository.NotificationRepository
 import br.com.fiap.challange.database.repository.UserRepository
 import br.com.fiap.challange.model.Match
 import br.com.fiap.challange.model.MatchUserStudent
+import br.com.fiap.challange.model.Notification
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
+import br.com.fiap.challange.utils.generateNotificationMessage
 import br.com.fiap.challange.utils.logoutUser
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -92,6 +98,7 @@ fun MatchScreen(
     val scope = rememberCoroutineScope()
     val userRepository = UserRepository(context)
     val matchRepository = MatchRepository(context)
+    val notificationRepository = NotificationRepository(context)
     val snackbarHostState = remember { SnackbarHostState() }
     var selected by remember { mutableStateOf("Alunos") }
     var userValue by remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
@@ -430,6 +437,15 @@ fun MatchScreen(
                                 }
                             }
                         }
+                    }else{
+                        Text(
+                            text = "A procura de novos ${selected.lowercase()}.",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(120.dp))
@@ -522,7 +538,7 @@ fun MatchScreen(
 
                                     if (currentMatch != null && currentMatch.isNotEmpty()) {
                                         userValue?.user?.let {
-                                            Match(
+                                            val match = Match(
                                                 id = currentMatch[0].id,
                                                 userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
                                                 userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
@@ -530,6 +546,32 @@ fun MatchScreen(
                                                 mentorHasMatch = if (selected == "Alunos") 1 else currentMatch[0].mentorHasMatch,
                                                 matchSubject = matchQueue[0].subject
                                             )
+
+                                            if(selected == "Mentores" && currentMatch[0].mentorHasMatch == 1){
+                                                notificationRepository.save(Notification(
+                                                    frontIcon = emojisList.random(),
+                                                    hasSeen = 0,
+                                                    message = generateNotificationMessage("aluno"),
+                                                    commomSubject = matchQueue[0].subject,
+                                                    fromUserId = userValue!!.user.id,
+                                                    toUserId = currentMatch[0].id,
+                                                    hasReceived = 0,
+                                                    requestType = "mentor"
+                                                ))
+                                            }else if(selected == "Alunos" && currentMatch[0].studentHasMatch == 1){
+                                                notificationRepository.save(Notification(
+                                                    frontIcon = emojisList.random(),
+                                                    hasSeen = 0,
+                                                    message = generateNotificationMessage("mentor"),
+                                                    commomSubject = matchQueue[0].subject,
+                                                    fromUserId = userValue!!.user.id,
+                                                    toUserId = currentMatch[0].id,
+                                                    hasReceived = 0,
+                                                    requestType = "aluno"
+                                                ))
+                                            }
+
+                                            match
                                         }?.let {
                                             matchRepository.update(it)
                                         }

@@ -10,8 +10,10 @@ import kotlinx.coroutines.withContext
 class NotificationRepository(context: Context) {
     private val db = AppDatabase.getDatabase(context).notificationDao()
 
-    fun save(notification: Notification): Long {
-        return db.save(notification)
+    suspend fun save(notification: Notification): Long {
+        return withContext(Dispatchers.IO) {
+            db.save (notification)
+        }
     }
 
     fun update(notification: Notification): Int {
@@ -22,7 +24,7 @@ class NotificationRepository(context: Context) {
         return db.delete(notification)
     }
 
-    suspend fun getNotificationsFromUserId(userId: Long): List<Notification> {
+    suspend fun getNotificationsFromUserId(userId: Long): List<NotificationWithUserNames> {
         return withContext(Dispatchers.IO) {
             db.getNotificationsFromUserId(userId)
         }
@@ -34,9 +36,9 @@ class NotificationRepository(context: Context) {
         }
     }
 
-    suspend fun markNotificationAsSeen(userId: Long, notificationId: Long): Int {
+    suspend fun markNotificationAsSeen(notificationId: Long): Int {
         return withContext(Dispatchers.IO) {
-            db.markNotificationAsSeen(userId, notificationId)
+            db.markNotificationAsSeen( notificationId)
         }
     }
 
