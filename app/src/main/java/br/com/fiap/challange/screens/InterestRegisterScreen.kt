@@ -2,6 +2,7 @@
 
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,11 +41,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun InterestRegisterScreen(navController: NavHostController, userId: String?, user: UserWithExperiencesAndInterests?) {
+fun InterestRegisterScreen(
+    navController: NavHostController,
+    user: UserWithExperiencesAndInterests?,
+    sharedViewModel: SharedViewModel
+) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val interestRepository = remember { InterestRepository(context) }
+    val userRepository = remember { UserRepository(context) }
 
     val step = remember { mutableStateOf<Int>(1) }
     val hasInterest = remember { mutableStateOf<Boolean>(false) }
@@ -53,7 +59,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
     val isLoading = remember { mutableStateOf<Boolean>(true) }
     val userValue = remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
 
-    LaunchedEffect(user) {
+    LaunchedEffect(Unit) {
         user?.let {
             hasInterest.value = user.interests.isNotEmpty()
 
@@ -76,7 +82,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
                 CircularProgressIndicator()
             }
         }
-        if (userId !== null && user != null) {
+        if (user != null) {
             if (!hasInterest.value) {
                 when (step.value) {
                     1 -> SelectInterestsScreen(onNext = { interests ->
@@ -109,7 +115,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
                                                         interest = interest,
                                                         description = interests[interest].toString(),
                                                         level = InterestsLevelList.indexOf(levels[interest]) + 1,
-                                                        userId = userId.toLong()
+                                                        userId = user.user.id
                                                     )
                                                 )
                                             }
@@ -117,11 +123,14 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
 
                                         saveJobs.awaitAll()
 
+                                        val updatedUser = userRepository.getUserById(user.user.id)
+                                        sharedViewModel.user = updatedUser
+
                                         if (userValue.value != null) {
                                             val userExperiences = userValue.value!!.experiences
 
                                             if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
-                                                navController.navigate("experienceRegister/${userId}")
+                                                navController.navigate("experienceRegister/${user.user.id}")
                                             } else {
                                                 navController.navigate("match")
                                             }
@@ -153,7 +162,7 @@ fun InterestRegisterScreen(navController: NavHostController, userId: String?, us
                         val userExperiences = userValue.value!!.experiences
 
                         if (userExperiences.isEmpty() && userValue.value!!.user.isMentor == 1) {
-                            navController.navigate("experienceRegister/${userId}")
+                            navController.navigate("experienceRegister/${user.user.id}")
                         } else {
                             navController.navigate("match")
                         }

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,29 +20,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -51,25 +42,17 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import br.com.fiap.challange.Components.Input
 import br.com.fiap.challange.R
-import br.com.fiap.challange.manager.UserManager
-import br.com.fiap.challange.ui.theme.Black
-import br.com.fiap.challange.ui.theme.Gray
 import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.MainBlue
 import br.com.fiap.challange.ui.theme.Purple100
 import androidx.compose.runtime.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.zIndex
 import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
@@ -84,7 +67,6 @@ import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.utils.generateNotificationMessage
 import br.com.fiap.challange.utils.logoutUser
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -103,8 +85,9 @@ fun MatchScreen(
     var selected by remember { mutableStateOf("Alunos") }
     var userValue by remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
     var matchQueue = remember { mutableStateListOf<MatchUserStudent>() }
+    val uniqueMatches = mutableSetOf<MatchUserStudent>()
 
-    LaunchedEffect(user) {
+    LaunchedEffect(Unit) {
         if (user != null) {
             userValue = user
             if (user.user.isStudent == 1) {
@@ -122,8 +105,6 @@ fun MatchScreen(
                 userValue?.user!!.id
             )
 
-            matchQueue.clear()
-
             usersToMatch.forEach { user ->
                 userValue?.experiences
                     ?.map { it.experience }
@@ -132,7 +113,7 @@ fun MatchScreen(
                     }.toSet())?.forEach { subject ->
                         val userInterest = user.interests.find { it.interest == subject }
 
-                        matchQueue.add(
+                        uniqueMatches.add(
                             MatchUserStudent(
                                 id = user.user.id,
                                 name = user.user.name,
@@ -145,6 +126,11 @@ fun MatchScreen(
                         )
                     }
             }
+
+            matchQueue.clear()
+            matchQueue.addAll(uniqueMatches.toSet())
+            uniqueMatches.clear()
+
         } else if (selected == "Mentores") {
             val usersToMatch = userRepository.getMentorToMatchFromInterests(
                 userValue?.interests!!.map { it.interest },

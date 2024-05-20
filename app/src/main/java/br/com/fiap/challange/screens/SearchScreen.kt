@@ -50,8 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import br.com.fiap.challange.Components.Input
-import br.com.fiap.challange.Components.Select
+import br.com.fiap.challange.components.Input
+import br.com.fiap.challange.components.Select
 import br.com.fiap.challange.R
 import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
@@ -64,7 +64,6 @@ import br.com.fiap.challange.ui.theme.LightBlue
 import br.com.fiap.challange.ui.theme.White
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")

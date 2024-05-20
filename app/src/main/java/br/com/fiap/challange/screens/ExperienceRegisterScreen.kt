@@ -1,5 +1,6 @@
 package br.com.fiap.challange.screens
 
+import SharedViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
 import br.com.fiap.challange.database.repository.ExperienceRepository
 import br.com.fiap.challange.database.repository.InterestRepository
+import br.com.fiap.challange.database.repository.UserRepository
 import br.com.fiap.challange.model.Experience
 import br.com.fiap.challange.model.Interest
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
@@ -34,10 +36,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, user: UserWithExperiencesAndInterests?) {
+fun ExperienceRegisterScreen(
+    navController: NavHostController,
+    user: UserWithExperiencesAndInterests?,
+    sharedViewModel: SharedViewModel
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val experienceRepository = remember { ExperienceRepository(context) }
+    val userRepository = remember { UserRepository(context) }
 
     val step = remember { mutableStateOf(1) }
     val hasExperiences = remember { mutableStateOf(false) }
@@ -45,10 +52,10 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, 
     val snackbarHostState = remember { SnackbarHostState() }
     val isLoading = remember { mutableStateOf(true) }
 
-    LaunchedEffect(user) {
+    LaunchedEffect(Unit) {
         user?.let {
             hasExperiences.value = user.experiences.isNotEmpty()
-            if(user.experiences.isEmpty()) isLoading.value = false
+            if (user.experiences.isEmpty()) isLoading.value = false
         }
     }
     Scaffold(
@@ -65,7 +72,7 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, 
                 CircularProgressIndicator()
             }
         }
-        if (userId !== null && user != null) {
+        if (user != null) {
             if (!hasExperiences.value) {
                 when (step.value) {
                     1 -> SelectExperiencesScreen(onNext = { experiences ->
@@ -99,13 +106,16 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, 
                                                         experience = experience,
                                                         description = experiences[experience].toString(),
                                                         level = ExperiencesLevelList.indexOf(levels[experience]) + 1,
-                                                        userId = userId.toLong()
+                                                        userId = user.user.id
                                                     )
                                                 )
                                             }
                                         }
 
                                         saveJobs.awaitAll()
+
+                                        val updatedUser = userRepository.getUserById(user.user.id)
+                                        sharedViewModel.user = updatedUser
 
                                         navController.navigate("match")
                                     } catch (err: Throwable) {
@@ -132,7 +142,7 @@ fun ExperienceRegisterScreen(navController: NavHostController, userId: String?, 
             } else {
                 navController.navigate("match")
             }
-        }else{
+        } else {
             navController.navigate("login")
         }
     }

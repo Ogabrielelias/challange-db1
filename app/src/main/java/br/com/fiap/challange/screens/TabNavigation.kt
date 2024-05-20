@@ -189,15 +189,15 @@ fun TabNavigationScreen(
             composable("interestRegister/{userId}") { backStackEntry ->
                 InterestRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId"),
-                    user = loggedUser
+                    user = loggedUser,
+                    sharedViewModel = sharedViewModel
                 )
             }
             composable("experienceRegister/{userId}") { backStackEntry ->
                 ExperienceRegisterScreen(
                     navController = navController,
-                    userId = backStackEntry.arguments?.getString("userId"),
-                    user = loggedUser
+                    user = loggedUser,
+                    sharedViewModel = sharedViewModel
                 )
             }
             composable("profile/{profileId}") { backStackEntry ->

@@ -31,8 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
-import br.com.fiap.challange.Components.Select
+import br.com.fiap.challange.components.Select
 import br.com.fiap.challange.R
 import br.com.fiap.challange.constants.interesstsList
 

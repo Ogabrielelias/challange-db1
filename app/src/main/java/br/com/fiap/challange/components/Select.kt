@@ -1,12 +1,7 @@
-package br.com.fiap.challange.Components
+package br.com.fiap.challange.components
 
-import android.widget.Toast
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,7 +9,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,9 +22,6 @@ import androidx.compose.ui.unit.dp
 import br.com.fiap.challange.ui.theme.Gray
 import br.com.fiap.challange.ui.theme.MainBlue
 
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.window.PopupProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +56,7 @@ fun Select(
                     expanded = true
                 }
             },
+            singleLine = true,
             label = {
                 if (label != null) {
                     Text(label)

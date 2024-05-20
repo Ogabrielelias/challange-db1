@@ -78,6 +78,7 @@ interface UserDAO {
             WHERE m.userMentorId = u.id
             AND m.studentHasMatch IS NOT NULL
             AND m.userStudentId = :id
+            AND e.experience = m.matchSubject
         )
         ORDER BY 
             CASE 
@@ -99,6 +100,7 @@ interface UserDAO {
             WHERE m.userStudentId = u.id
             AND m.mentorHasMatch IS NOT NULL
             AND m.userMentorId = :id
+            AND i.interest = m.matchSubject
         )
         ORDER BY 
             CASE 

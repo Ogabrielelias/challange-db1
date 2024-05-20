@@ -40,13 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.navigation.NavController
-import br.com.fiap.challange.Components.Input
-import br.com.fiap.challange.Components.Select
+import br.com.fiap.challange.components.Input
+import br.com.fiap.challange.components.Select
 import br.com.fiap.challange.R
 import br.com.fiap.challange.constants.userRoleList
-import br.com.fiap.challange.database.repository.InterestRepository
 import br.com.fiap.challange.database.repository.UserRepository
-import br.com.fiap.challange.model.Interest
 import br.com.fiap.challange.model.User
 import br.com.fiap.challange.ui.theme.MainBlue
 import kotlinx.coroutines.launch
