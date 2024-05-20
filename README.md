@@ -28,7 +28,3 @@ O objetivo do aplicativo é facilitar a conexão entre mentores e aprendizes, pr
 O Tinder de Mentores e Aprendizes é mais do que um simples aplicativo; é uma plataforma que promove o crescimento profissional e acadêmico por meio de conexões significativas. Ao reunir mentores e aprendizes com interesses e objetivos comuns, criamos um ambiente propício para o compartilhamento de conhecimento e o desenvolvimento contínuo.
 
 Estamos entusiasmados em ver como essa solução pode transformar a maneira como mentores e aprendizes se conectam e colaboram. Junte-se a nós nessa jornada e aproveite ao máximo essa experiência inovadora!
-
----
-
-Obrigado por escolher o Tinder de Mentores e Aprendizes!
