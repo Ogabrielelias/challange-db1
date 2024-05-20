@@ -102,7 +102,7 @@ fun MatchScreen(
         }
     }
 
-    LaunchedEffect(matchQueue) {
+    LaunchedEffect(matchQueue,selected) {
         if (selected == "Alunos") {
             val usersToMatch = userRepository.getStudentsToMatchFromExperiences(
                 userValue?.experiences!!.map { it.experience },
