@@ -72,10 +72,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import br.com.fiap.challange.constants.ExperiencesLevelList
 import br.com.fiap.challange.constants.InterestsLevelList
+import br.com.fiap.challange.database.repository.MatchRepository
 import br.com.fiap.challange.database.repository.UserRepository
+import br.com.fiap.challange.model.Match
 import br.com.fiap.challange.model.MatchUserStudent
 import br.com.fiap.challange.model.UserWithExperiencesAndInterests
 import br.com.fiap.challange.utils.logoutUser
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -86,7 +89,9 @@ fun MatchScreen(
     sharedViewModel: SharedViewModel
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val userRepository = UserRepository(context)
+    val matchRepository = MatchRepository(context)
     val snackbarHostState = remember { SnackbarHostState() }
     var selected by remember { mutableStateOf("Alunos") }
     var userValue by remember { mutableStateOf<UserWithExperiencesAndInterests?>(null) }
@@ -104,7 +109,6 @@ fun MatchScreen(
     }
 
     LaunchedEffect(selected) {
-
         if (selected == "Alunos") {
             val usersToMatch = userRepository.getStudentsToMatchFromExperiences(
                 userValue?.experiences!!.map { it.experience },
@@ -128,7 +132,8 @@ fun MatchScreen(
                                 subject = subject,
                                 level = userInterest!!.level,
                                 description = userInterest.description,
-                                othersList = user.interests.map{it.interest}.filter{it != subject}
+                                othersList = user.interests.map { it.interest }
+                                    .filter { it != subject }
                             )
                         )
                     }
@@ -142,7 +147,6 @@ fun MatchScreen(
             matchQueue.clear()
 
             usersToMatch.forEach { user ->
-                println(user)
                 userValue?.interests
                     ?.map { it.interest }
                     ?.intersect(user.experiences.map {
@@ -157,7 +161,8 @@ fun MatchScreen(
                                 subject = subject,
                                 level = userInterest!!.level,
                                 description = userInterest.description,
-                                othersList = user.experiences.map{it.experience}.filter{it != subject}
+                                othersList = user.experiences.map { it.experience }
+                                    .filter { it != subject }
                             )
                         )
                     }
@@ -357,7 +362,7 @@ fun MatchScreen(
                                     level = InterestsLevelList[matchQueue[0].level - 1],
                                     describe = matchQueue[0].description
                                 )
-                                if(matchQueue[0].othersList.isNotEmpty()){
+                                if (matchQueue[0].othersList.isNotEmpty()) {
                                     Row {
                                         Text(
                                             text = "Outros conhecimentos:",
@@ -405,7 +410,7 @@ fun MatchScreen(
                                     describe = matchQueue[0].description
                                 )
 
-                                if(matchQueue[0].othersList.isNotEmpty()){
+                                if (matchQueue[0].othersList.isNotEmpty()) {
                                     Row {
                                         Text(
                                             text = "Outras experiências:",
@@ -431,36 +436,105 @@ fun MatchScreen(
             }
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .zIndex(11f),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Column(
-            horizontalAlignment = Alignment.End
+    if (matchQueue.isNotEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .zIndex(11f),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                horizontalAlignment = Alignment.End
             ) {
-                RejectButton()
-                LikeButton()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RejectButton(onClick = {
+                        try {
+                            scope.launch {
+                                if (matchQueue.isNotEmpty()) {
+                                    val currentMatch = (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                        (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                            matchRepository.getMatchesByMentorStudentAndSubject(
+                                                matchSubject = matchQueue[0].subject,
+                                                mentorId = mentorId,
+                                                studentId = studentId
+                                            )
+                                        }
+                                    }
+
+                                    if (currentMatch != null) {
+                                        if (currentMatch.isNotEmpty()) {
+                                            userValue?.user?.let {
+                                                Match(
+                                                    id = currentMatch[0].id,
+                                                    userMentorId = if (selected == "Mentores") matchQueue[0].id else it.id,
+                                                    userStudentId = if (selected == "Mentores") it.id else matchQueue[0].id,
+                                                    studentHasMatch = if (selected == "Mentores") 0 else null,
+                                                    mentorHasMatch = if (selected == "Alunos") 0 else null,
+                                                    matchSubject = matchQueue[0].subject
+                                                )
+                                            }?.let {
+                                                matchRepository.update(it)
+                                            }
+                                        } else {
+                                            (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                                (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                                    Match(
+                                                        userMentorId = mentorId,
+                                                        userStudentId = studentId,
+                                                        studentHasMatch = if (selected == "Mentores") 0 else null,
+                                                        mentorHasMatch = if (selected == "Alunos") 0 else null,
+                                                        matchSubject = matchQueue[0].subject
+                                                    )
+                                                }
+                                            }?.let {
+                                                matchRepository.save(it)
+                                            }
+                                        }
+                                    } else {
+                                        (if (selected == "Mentores") matchQueue[0].id else userValue?.user?.id)?.let { mentorId ->
+                                            (if (selected == "Mentores") userValue?.user?.id else matchQueue[0].id)?.let { studentId ->
+                                                Match(
+                                                    userMentorId = mentorId,
+                                                    userStudentId = studentId,
+                                                    studentHasMatch = if (selected == "Mentores") 0 else null,
+                                                    mentorHasMatch = if (selected == "Alunos") 0 else null,
+                                                    matchSubject = matchQueue[0].subject
+                                                )
+                                            }
+                                        }?.let {
+                                            matchRepository.save(it)
+                                        }
+                                    }
+
+                                    matchQueue.removeAt(0)
+                                }
+                            }
+                        } catch (err: Throwable) {
+                            println(err)
+                        }
+                    })
+                    LikeButton(onClick = {
+
+                    })
+                }
+                Spacer(modifier = Modifier.height(70.dp))
             }
-            Spacer(modifier = Modifier.height(70.dp))
         }
     }
 }
 
 
 @Composable
-fun LikeButton() {
+fun LikeButton(onClick: () -> Unit) {
     Button(
-        onClick = { /* ação do botão */ },
+        onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
         )
@@ -474,9 +548,9 @@ fun LikeButton() {
 }
 
 @Composable
-fun RejectButton() {
+fun RejectButton(onClick: () -> Unit) {
     Button(
-        onClick = { /* ação do botão */ },
+        onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
         )

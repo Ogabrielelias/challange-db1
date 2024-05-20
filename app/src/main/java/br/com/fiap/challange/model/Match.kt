@@ -19,6 +19,7 @@ data class Match(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val userMentorId: Long,
     val userStudentId: Long,
+    val matchSubject: String,
     val mentorHasMatch: Int?,
     val studentHasMatch: Int?
 )

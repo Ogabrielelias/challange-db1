@@ -71,17 +71,19 @@ interface UserDAO {
         FROM tb_user u
         LEFT JOIN tb_experience e ON u.id = e.userId
         LEFT JOIN tb_interest i ON u.id = i.userId
-        LEFT JOIN tb_match m ON u.id = m.userStudentId
         WHERE e.experience IN (:interestList)
-        AND (m.studentHasMatch != 1 AND m.mentorHasMatch != 1)
-        AND m.mentorHasMatch != 1
+        AND NOT EXISTS (
+            SELECT 1
+            FROM tb_match m
+            WHERE m.userMentorId = u.id
+            AND m.studentHasMatch IS NOT NULL
+            AND m.userStudentId = :id
+        )
         ORDER BY 
-        CASE 
-            WHEN e.experience IN (:interestList) AND m.studentHasMatch = 1 AND m.userMentorId = :id THEN 1
-            WHEN e.experience IN (:interestList) THEN 2
-            ELSE 3
-        END
-              
+            CASE 
+                WHEN e.experience IN (:interestList) THEN 2
+                ELSE 3
+            END
     """)
     fun getMentorToMatchFromInterests(interestList: List<String>, id: Long): List<UserWithExperiencesAndInterests>
 
@@ -90,16 +92,19 @@ interface UserDAO {
         FROM tb_user u
         LEFT JOIN tb_experience e ON u.id = e.userId
         LEFT JOIN tb_interest i ON u.id = i.userId
-        LEFT JOIN tb_match m ON u.id = m.userStudentId
         WHERE i.interest IN (:experienceList)
-        AND (m.studentHasMatch != 1 AND m.mentorHasMatch != 1)
-        AND m.mentorHasMatch != 1
+        AND NOT EXISTS (
+            SELECT 1
+            FROM tb_match m
+            WHERE m.userStudentId = u.id
+            AND m.mentorHasMatch IS NOT NULL
+            AND m.userMentorId = :id
+        )
         ORDER BY 
-        CASE 
-            WHEN i.interest IN (:experienceList) AND m.studentHasMatch = 1 AND m.userMentorId = :id THEN 1
-            WHEN i.interest IN (:experienceList) THEN 2
-            ELSE 3
-        END
+            CASE 
+                WHEN i.interest IN (:experienceList) THEN 2
+                ELSE 3
+            END
     """)
     fun getStudentsToMatchFromExperiences(experienceList: List<String>, id:Long): List<UserWithExperiencesAndInterests>
 }
